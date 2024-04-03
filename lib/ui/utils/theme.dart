@@ -31,13 +31,13 @@ class SysAppTheme{
 
   Color white = const Color(0xffffffff);
   Color black = const Color(0xff292526);
-  Color backgroundColor = const Color(0xfff7f8f8);
+  Color backgroundColor = const Color(0xffffffff);
   Color backgroundLowContrast = const Color(0xffdee0e1);
-  Color cardColor = const Color(0xfffafafa);
+  Color cardColor = const Color(0xffeaeaea);
   Color buttonColor = const Color(0xff292526);
   Color buttonTextColor = const Color(0xffffffff);
   Color defaultGrey = const Color(0xffeaebeb);
-  Color borderGrey = const Color(0xffeaebeb);
+  Color borderGrey = const Color(0xffd7d7d7);
   Color textGrey = const Color(0xff969999);
   Color textColor = const Color(0xff292526);
   Color highlightColor = const Color(0xfffb8c3b);
@@ -49,11 +49,11 @@ class SysAppTheme{
         white = const Color(0xffffffff);
         backgroundColor = const Color(0xffffffff);
         backgroundLowContrast = const Color(0xffdee0e1);
-        cardColor = const Color(0xfffafafa);
+        cardColor = const Color(0xffeaeaea);
         buttonColor = const Color(0xff292526);
         buttonTextColor = const Color(0xffffffff);
         defaultGrey = const Color(0xffeaebeb);
-        borderGrey = const Color(0xffeaebeb);
+        borderGrey = const Color(0xffd7d7d7);
         textGrey = const Color(0xff969999);
         textColor = const Color(0xff292526);
         highlightColor = const Color(0xfffb8c3b);
@@ -84,11 +84,11 @@ class SysAppTheme{
 
   double fontSizeBannerHeading = 30;
   double fontSizeBannerBody = 14;
-  double fontSizeDefaultHeading = 30;
-  double fontSizeDefaultBody = 30;
+  double fontSizeDefaultHeading = 18;
+  double fontSizeDefaultBody = 16;
   double fontSizePageTitle = 30;
-  double fontSizeTabBar = 30;
-  double fontSizeBottomNav = 30;
+  double fontSizeTabBar = 18;
+  double fontSizeBottomNav = 14;
 
   FontWeight fontWeightBannerHeading = FontWeight.w600;
   FontWeight fontWeightDefaultHeading = FontWeight.w500;

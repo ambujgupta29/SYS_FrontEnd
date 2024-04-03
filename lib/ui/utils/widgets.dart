@@ -9,6 +9,7 @@ Widget TextFieldBox({
   TextStyle? textStyle,
   String? hintText,
   TextStyle? hintTextStyle,
+  int? maxLength,
   bool obscureText = false,
   void Function(String)? onChanged,
   Widget? trailingIcon,
@@ -17,11 +18,13 @@ Widget TextFieldBox({
   Color? borderColor,
   bool hasShadow = false,
   Color? shadowColor,
+  EdgeInsets? padding,
 }){
   return Container(
+    padding: padding ?? const EdgeInsets.symmetric(horizontal: 25),
     height: height,
     width: width,
-    padding: const EdgeInsets.symmetric(horizontal: 15),
+    alignment: Alignment.center,
     decoration: BoxDecoration(
       color: color ?? SysAppTheme().cardColor,
       borderRadius: BorderRadius.circular(SysAppTheme().borderRadiusForButton),
@@ -39,6 +42,7 @@ Widget TextFieldBox({
           : null,
     ),
     child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (leadingIcon != null)
           Padding(
@@ -51,21 +55,25 @@ Widget TextFieldBox({
           child: TextField(
             controller: controller,
             maxLines: 1,
-            maxLength: 30,
+            maxLength: maxLength ?? 30,
             obscureText: obscureText,
             decoration: InputDecoration(
+              contentPadding: const EdgeInsets.all(0),
               enabledBorder: InputBorder.none,
               hintText: hintText,
-              hintStyle: SysAppTheme().textStyle(
-                fontSize: 16,
+              hintStyle: hintTextStyle ?? SysAppTheme().textStyle(
+                fontSize: SysAppTheme().fontSizeDefaultHeading,
+                fontWeight: SysAppTheme().fontWeightDefaultBody,
                 color: SysAppTheme().textGrey,
               ),
               focusedBorder: InputBorder.none,
               disabledBorder: InputBorder.none,
               counterText: '',
             ),
-            style: SysAppTheme().textStyle(
-              color: SysAppTheme().textGrey,
+            style: textStyle ?? SysAppTheme().textStyle(
+              fontSize: SysAppTheme().fontSizeDefaultHeading,
+              fontWeight: SysAppTheme().fontWeightDefaultHeading,
+              color: SysAppTheme().textColor,
             ),
             onChanged: onChanged,
           ),
