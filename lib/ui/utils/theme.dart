@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 enum SysAppThemes{light, lightHC, dark}
@@ -12,26 +14,40 @@ class SysAppTheme{
   bool isDarkTheme() => currentTheme == SysAppThemes.dark;
   bool isThemeEquals(SysAppThemes theme) => currentTheme == theme;
 
-  Color black = const Color(0xff121212);
+  // Color black = const Color(0xff121212);
+  // Color white = const Color(0xffffffff);
+  // Color backgroundColor = const Color(0xffffffff);
+  // Color backgroundLowContrast = const Color(0xffe6e9eb);
+  // Color cardColor = const Color(0xffffffff);
+  // Color buttonColor = const Color(0xff121212);
+  // Color buttonTextColor = const Color(0xffffffff);
+  // Color defaultGrey = const Color(0xfff0f0f0);
+  // Color borderGrey = const Color(0xffe3e3e3);
+  // Color textGrey = const Color(0xff888888);
+  // Color textColor = const Color(0xff121212);
+  // Color highlightColor = const Color(0xfffb8c3b);
+  // // Color black = const Color(0xff);
+
+
   Color white = const Color(0xffffffff);
-  Color backgroundColor = const Color(0xffffffff);
-  Color backgroundLowContrast = const Color(0xffe6e9eb);
-  Color cardColor = const Color(0xff);
-  Color buttonColor = const Color(0xff121212);
+  Color black = const Color(0xff292526);
+  Color backgroundColor = const Color(0xfff7f8f8);
+  Color backgroundLowContrast = const Color(0xffdee0e1);
+  Color cardColor = const Color(0xfffafafa);
+  Color buttonColor = const Color(0xff292526);
   Color buttonTextColor = const Color(0xffffffff);
-  Color defaultGrey = const Color(0xfff0f0f0);
-  Color borderGrey = const Color(0xffe3e3e3);
-  Color textGrey = const Color(0xff888888);
-  Color textColor = const Color(0xff121212);
+  Color defaultGrey = const Color(0xffeaebeb);
+  Color borderGrey = const Color(0xffeaebeb);
+  Color textGrey = const Color(0xff969999);
+  Color textColor = const Color(0xff292526);
   Color highlightColor = const Color(0xfffb8c3b);
-  // Color black = const Color(0xff);
 
   void setTheme(SysAppThemes theme){
     switch(theme){
       case SysAppThemes.light:
         black = const Color(0xff292526);
         white = const Color(0xffffffff);
-        backgroundColor = const Color(0xfff7f8f8);
+        backgroundColor = const Color(0xffffffff);
         backgroundLowContrast = const Color(0xffdee0e1);
         cardColor = const Color(0xfffafafa);
         buttonColor = const Color(0xff292526);
@@ -64,17 +80,21 @@ class SysAppTheme{
   }
 
   double borderRadiusForCard = 20;
-  double borderRadiusForButton = 20;
+  double borderRadiusForButton = 2000;
 
   double fontSizeBannerHeading = 30;
   double fontSizeBannerBody = 14;
-  double fontSizeDefaultHeader = 30;
+  double fontSizeDefaultHeading = 30;
   double fontSizeDefaultBody = 30;
   double fontSizePageTitle = 30;
   double fontSizeTabBar = 30;
   double fontSizeBottomNav = 30;
 
-  TextStyle SysTextStyle({
+  FontWeight fontWeightBannerHeading = FontWeight.w600;
+  FontWeight fontWeightDefaultHeading = FontWeight.w500;
+  FontWeight fontWeightDefaultBody = FontWeight.w400;
+
+  TextStyle textStyle({
     Color? color,
     double? fontSize,
     FontWeight? fontWeight,
@@ -85,7 +105,7 @@ class SysAppTheme{
     return TextStyle(
       color: color ?? textColor,
       fontSize: fontSize ?? fontSizeDefaultBody,
-      fontWeight: fontWeight,
+      fontWeight: fontWeight ?? fontWeightDefaultBody,
       fontStyle: fontStyle,
       fontFamily: fontFamily,
       overflow: overflow,
