@@ -19,6 +19,7 @@ Widget TextFieldBox({
   bool hasShadow = false,
   Color? shadowColor,
   EdgeInsets? padding,
+  TextAlign? textAlign,
 }){
   return Container(
     padding: padding ?? const EdgeInsets.symmetric(horizontal: 25),
@@ -57,6 +58,7 @@ Widget TextFieldBox({
             maxLines: 1,
             maxLength: maxLength ?? 30,
             obscureText: obscureText,
+            // expands: false,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.all(0),
               enabledBorder: InputBorder.none,
@@ -75,6 +77,7 @@ Widget TextFieldBox({
               fontWeight: SysAppTheme().fontWeightDefaultHeading,
               color: SysAppTheme().textColor,
             ),
+            textAlign: textAlign ?? TextAlign.left,
             onChanged: onChanged,
           ),
         ),

@@ -26,17 +26,27 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hello there...',
+                  'Hello there!',
                   style: SysAppTheme().textStyle(
                     fontSize: SysAppTheme().fontSizeBannerHeading,
                     fontWeight: SysAppTheme().fontWeightBannerHeading,
                     color: SysAppTheme().textColor,
                   ),
                 ),
-                const SizedBox(height: 10,),
+                // const SizedBox(height: 10,),
+                Text(
+                  'We need your phone number to proceed. This number will be used for accessing your account in the future.',
+                  style: SysAppTheme().textStyle(
+                    fontSize: SysAppTheme().fontSizeBannerBody,
+                    fontWeight: SysAppTheme().fontWeightDefaultBody,
+                    color: SysAppTheme().textColor,
+                  ),
+                ),
+                const SizedBox(height: 20,),
                 TextFieldBox(
                   padding: const EdgeInsets.only(left: 0, right: 25),
-                  hintText: 'Enter phone',
+                  hintText: 'Enter number',
+                  maxLength: 10,
                   leadingIcon: Row(
                     children: <Widget>[
                       CircleAvatar(
@@ -64,11 +74,12 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
               ],
             ),
             Button(
+                onTap: ()=>Navigator.of(context).pushNamed('/login-otp'),
               // text: 'Login',
               icon: Icon(
                 Icons.chevron_right,
                 color: SysAppTheme().buttonTextColor,
-              )
+              ),
             ),
           ],
         ),
