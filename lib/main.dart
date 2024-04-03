@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sys_mobile/ui/screens/login/login_otp_screen.dart';
 import 'package:sys_mobile/ui/screens/login/login_phone_screen.dart';
 import 'package:sys_mobile/ui/screens/splash/splash_screen.dart';
 
@@ -9,7 +10,7 @@ void main() {
       '/': (context) => const SplashScreen(),
       '/login-phone': (context) => const LoginPhoneScreen(),
       // '/login-signup': (context) => ,
-      // '/login-otp': (context) => ,
+      '/login-otp': (context) => const LoginOtpScreen(),
       // '/dashboard': (context) => ,
     },
   ));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sys_mobile/ui/utils/app_images.dart';
 import 'package:sys_mobile/ui/utils/theme.dart';
 import 'package:sys_mobile/ui/utils/widgets.dart';
 
@@ -25,24 +26,60 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hello there...',
+                  'Hello there!',
                   style: SysAppTheme().textStyle(
-                    color: SysAppTheme().textColor,
                     fontSize: SysAppTheme().fontSizeBannerHeading,
                     fontWeight: SysAppTheme().fontWeightBannerHeading,
+                    color: SysAppTheme().textColor,
                   ),
                 ),
+                // const SizedBox(height: 10,),
+                Text(
+                  'We need your phone number to proceed. This number will be used for accessing your account in the future.',
+                  style: SysAppTheme().textStyle(
+                    fontSize: SysAppTheme().fontSizeBannerBody,
+                    fontWeight: SysAppTheme().fontWeightDefaultBody,
+                    color: SysAppTheme().textColor,
+                  ),
+                ),
+                const SizedBox(height: 20,),
                 TextFieldBox(
-                  hintText: 'Enter phone',
+                  padding: const EdgeInsets.only(left: 0, right: 25),
+                  hintText: 'Enter number',
+                  maxLength: 10,
+                  leadingIcon: Row(
+                    children: <Widget>[
+                      CircleAvatar(
+                        backgroundImage: AppImages.indianFlagCircular(),
+                        radius: 14,
+                      ),
+                      const SizedBox(width: 10,),
+                      Text(
+                        '+91',
+                        style: SysAppTheme().textStyle(
+                          fontSize: SysAppTheme().fontSizeDefaultHeading,
+                          fontWeight: SysAppTheme().fontWeightDefaultHeading,
+                          color: SysAppTheme().textColor,
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(left: 15),
+                        height: 24,
+                        width: 1,
+                        color: SysAppTheme().borderGrey,
+                      )
+                    ],
+                  ),
                 ),
               ],
             ),
             Button(
+                onTap: ()=>Navigator.of(context).pushNamed('/login-otp'),
               // text: 'Login',
               icon: Icon(
                 Icons.chevron_right,
                 color: SysAppTheme().buttonTextColor,
-              )
+              ),
             ),
           ],
         ),
