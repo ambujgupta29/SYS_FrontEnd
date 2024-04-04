@@ -1,6 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:sys_mobile/ui/utils/app_images.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sys_mobile/bloc/login/login_bloc.dart';
+import 'package:sys_mobile/bloc/login/login_event.dart';
+import 'package:sys_mobile/bloc/login/login_state.dart';
 import 'package:sys_mobile/ui/utils/theme.dart';
 import 'package:sys_mobile/ui/utils/widgets.dart';
 
@@ -12,14 +15,15 @@ class LoginOtpScreen extends StatefulWidget {
 }
 
 class _LoginOtpScreenState extends State<LoginOtpScreen> {
+  LoginBloc? _loginBloc;
   int timerMin = 00;
   int timerSec = 30;
 
   void startTimer({int seconds = 30}) async {
     timerMin = seconds ~/ 60;
-    timerSec = seconds % 60 ;
+    timerSec = seconds % 60;
 
-    while(timerMin > 0 || timerSec > 0){
+    while (timerMin > 0 || timerSec > 0) {
       await Future.delayed(const Duration(milliseconds: 1000));
       setState(() {
         if (timerSec > 0) {
@@ -35,11 +39,24 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
     }
   }
 
+  Future<void> verifyOtpListener(state) async {
+    if (state is VerifyOTPSuccessState) {
+      print(state.verifyOTPModel.message);
+      print(state.verifyOTPModel.accessToken);
+    } else if (state is VerifyOTPFailedState) {
+      print(state.message);
+    } else if (state is VerifyOTPProgressState) {}
+    if (state is SendOTPSuccessState) {
+      print(state.message);
+    } else if (state is SendOTPFailedState) {
+      print(state.message);
+    } else if (state is SendOTPProgressState) {}
+  }
+
   @override
   void initState() {
-
     startTimer();
-
+    _loginBloc = BlocProvider.of<LoginBloc>(context);
     super.initState();
   }
 
@@ -66,7 +83,9 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 10,),
+                const SizedBox(
+                  height: 10,
+                ),
                 Text(
                   'A 4-digit OTP has been sent to your number. Please confirm the OTP to validate your phone number.',
                   style: SysAppTheme().textStyle(
@@ -76,7 +95,9 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40,),
+                const SizedBox(
+                  height: 40,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -92,7 +113,9 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(width: 10,),
+                    const SizedBox(
+                      width: 10,
+                    ),
                     TextFieldBox(
                       padding: const EdgeInsets.only(left: 15, right: 10),
                       height: 60,
@@ -105,7 +128,9 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(width: 10,),
+                    const SizedBox(
+                      width: 10,
+                    ),
                     TextFieldBox(
                       padding: const EdgeInsets.only(left: 15, right: 10),
                       height: 60,
@@ -118,7 +143,9 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(width: 10,),
+                    const SizedBox(
+                      width: 10,
+                    ),
                     TextFieldBox(
                       padding: const EdgeInsets.only(left: 15, right: 10),
                       height: 60,
@@ -133,10 +160,12 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 40,),
+                const SizedBox(
+                  height: 40,
+                ),
                 if (timerMin > 0 || timerSec > 0)
                   Text(
-                    '${timerMin.toString().padLeft(2,'0')}:${timerSec.toString().padLeft(2,'0')}',
+                    '${timerMin.toString().padLeft(2, '0')}:${timerSec.toString().padLeft(2, '0')}',
                     style: SysAppTheme().textStyle(
                       fontSize: SysAppTheme().fontSizeDefaultBody,
                       fontWeight: SysAppTheme().fontWeightDefaultBody,
@@ -157,17 +186,22 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                         ),
                         TextSpan(
                           text: 'Resend OTP',
-                          style: SysAppTheme().textStyle(
-                            fontSize: SysAppTheme().fontSizeBannerBody,
-                            fontWeight: SysAppTheme().fontWeightDefaultHeading,
-                            color: SysAppTheme().textColor,
-                          ).copyWith(
-                            decoration: TextDecoration.underline,
-                            // decorationThickness: 2,
-                          ),
+                          style: SysAppTheme()
+                              .textStyle(
+                                fontSize: SysAppTheme().fontSizeBannerBody,
+                                fontWeight:
+                                    SysAppTheme().fontWeightDefaultHeading,
+                                color: SysAppTheme().textColor,
+                              )
+                              .copyWith(
+                                decoration: TextDecoration.underline,
+                                // decorationThickness: 2,
+                              ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
                               // todo add resend func here
+                              _loginBloc?.add(
+                                  SendOTPEvent(mobileNumber: "8957078301"));
                               startTimer();
                             },
                         ),
@@ -177,6 +211,10 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
               ],
             ),
             Button(
+              onTap: () {
+                _loginBloc?.add(
+                    VerifyOTPEvent(mobileNumber: "8957078301", otp: "4122"));
+              },
               // onTap: ()=>Navigator.of(context).pushNamed(''),
               text: 'Confirm',
               //   icon: Icon(

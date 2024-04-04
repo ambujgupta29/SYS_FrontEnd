@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sys_mobile/bloc/login/login_bloc.dart';
+import 'package:sys_mobile/bloc/login/login_event.dart';
+import 'package:sys_mobile/bloc/login/login_state.dart';
+import 'package:sys_mobile/common/loader_control.dart';
 import 'package:sys_mobile/ui/utils/app_images.dart';
 import 'package:sys_mobile/ui/utils/theme.dart';
 import 'package:sys_mobile/ui/utils/widgets.dart';
@@ -11,6 +16,39 @@ class LoginPhoneScreen extends StatefulWidget {
 }
 
 class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
+  LoginBloc? _loginBloc;
+
+  TextEditingController mobileNumberController = TextEditingController();
+
+  @override
+  void initState() {
+    _loginBloc = BlocProvider.of<LoginBloc>(context);
+    _loginBloc?.stream.listen(isExistingUserListener);
+    super.initState();
+  }
+
+  Future<void> isExistingUserListener(state) async {
+    if (state is MobileNumberExistSuccessState) {
+      stopLoader(context);
+      if (state.message == true) {
+        _loginBloc
+            ?.add(UserLoginEvent(mobileNumber: mobileNumberController.text));
+        Navigator.of(context).pushNamed('/login-otp');
+      } else {
+        //Navigate to SignUp Screen
+      }
+    } else if (state is MobileNumberExistFailedState) {
+      print(state.message);
+      stopLoader(context);
+    } else if (state is MobileNumberExistProgressState) {
+      startLoader(context);
+    } else if (state is UserLoginSuccessState) {
+      print(state.message);
+    } else if (state is UserLoginFailedState) {
+      print(state.message);
+    } else if (state is UserLoginProgressState) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,8 +80,11 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
                     color: SysAppTheme().textColor,
                   ),
                 ),
-                const SizedBox(height: 20,),
+                const SizedBox(
+                  height: 20,
+                ),
                 TextFieldBox(
+                  controller: mobileNumberController,
                   padding: const EdgeInsets.only(left: 0, right: 25),
                   hintText: 'Enter number',
                   maxLength: 10,
@@ -53,7 +94,9 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
                         backgroundImage: AppImages.indianFlagCircular(),
                         radius: 14,
                       ),
-                      const SizedBox(width: 10,),
+                      const SizedBox(
+                        width: 10,
+                      ),
                       Text(
                         '+91',
                         style: SysAppTheme().textStyle(
@@ -74,7 +117,15 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
               ],
             ),
             Button(
-                onTap: ()=>Navigator.of(context).pushNamed('/login-otp'),
+              onTap: () {
+                if (mobileNumberController.text.length == 10) {
+                  _loginBloc?.add(MobileNumberExistEvent(
+                      mobileNumber: mobileNumberController.text));
+                  // Navigator.of(context).pushNamed('/login-otp');
+                } else {
+                  print('Invalid Mobile Number');
+                }
+              },
               // text: 'Login',
               icon: Icon(
                 Icons.chevron_right,

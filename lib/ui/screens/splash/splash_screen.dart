@@ -14,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     SysAppTheme().setTheme(SysAppThemes.light);
-    Future.delayed(Duration(milliseconds: 3000),()=>Navigator.of(context).pushNamed('/login-phone'));
+    Future.delayed(const Duration(milliseconds: 3000),()=>Navigator.of(context).pushNamed('/login-phone'));
     super.initState();
   }
   @override
