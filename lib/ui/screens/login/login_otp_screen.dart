@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sys_mobile/bloc/login/login_bloc.dart';
 import 'package:sys_mobile/bloc/login/login_event.dart';
 import 'package:sys_mobile/bloc/login/login_state.dart';
+import 'package:sys_mobile/common/loader_control.dart';
 import 'package:sys_mobile/ui/utils/theme.dart';
 import 'package:sys_mobile/ui/utils/widgets.dart';
 
@@ -16,47 +19,57 @@ class LoginOtpScreen extends StatefulWidget {
 
 class _LoginOtpScreenState extends State<LoginOtpScreen> {
   LoginBloc? _loginBloc;
-  int timerMin = 00;
-  int timerSec = 30;
+  int _secondsLeft = 30;
+  late Timer _timer;
 
-  void startTimer({int seconds = 30}) async {
-    timerMin = seconds ~/ 60;
-    timerSec = seconds % 60;
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 
-    while (timerMin > 0 || timerSec > 0) {
-      await Future.delayed(const Duration(milliseconds: 1000));
+  void startTimer({int seconds = 30}) {
+    _secondsLeft = seconds;
+    const oneSecond = Duration(seconds: 1);
+    _timer = Timer.periodic(oneSecond, (timer) {
       setState(() {
-        if (timerSec > 0) {
-          timerSec--;
-        } else if (timerMin > 0) {
-          timerMin--;
-          timerSec = 59;
+        if (_secondsLeft == 0) {
+          timer.cancel();
         } else {
-          timerMin = 0;
-          timerSec = 0;
+          _secondsLeft--;
         }
       });
-    }
+    });
   }
 
   Future<void> verifyOtpListener(state) async {
     if (state is VerifyOTPSuccessState) {
+      stopLoader(context);
       print(state.verifyOTPModel.message);
       print(state.verifyOTPModel.accessToken);
     } else if (state is VerifyOTPFailedState) {
+      stopLoader(context);
       print(state.message);
-    } else if (state is VerifyOTPProgressState) {}
+    } else if (state is VerifyOTPProgressState) {
+      startLoader(context);
+    }
     if (state is SendOTPSuccessState) {
+      stopLoader(context);
       print(state.message);
+      startTimer();
     } else if (state is SendOTPFailedState) {
+      stopLoader(context);
       print(state.message);
-    } else if (state is SendOTPProgressState) {}
+    } else if (state is SendOTPProgressState) {
+      startLoader(context);
+    }
   }
 
   @override
   void initState() {
     startTimer();
     _loginBloc = BlocProvider.of<LoginBloc>(context);
+    _loginBloc?.stream.listen(verifyOtpListener);
     super.initState();
   }
 
@@ -163,9 +176,9 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                 const SizedBox(
                   height: 40,
                 ),
-                if (timerMin > 0 || timerSec > 0)
+                if (_secondsLeft > 0)
                   Text(
-                    '${timerMin.toString().padLeft(2, '0')}:${timerSec.toString().padLeft(2, '0')}',
+                    '${00.toString().padLeft(2, '0')}:${_secondsLeft.toString().padLeft(2, '0')}',
                     style: SysAppTheme().textStyle(
                       fontSize: SysAppTheme().fontSizeDefaultBody,
                       fontWeight: SysAppTheme().fontWeightDefaultBody,
@@ -202,7 +215,6 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                               // todo add resend func here
                               _loginBloc?.add(
                                   SendOTPEvent(mobileNumber: "8957078301"));
-                              startTimer();
                             },
                         ),
                       ],
@@ -213,7 +225,7 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
             Button(
               onTap: () {
                 _loginBloc?.add(
-                    VerifyOTPEvent(mobileNumber: "8957078301", otp: "4122"));
+                    VerifyOTPEvent(mobileNumber: "8957078301", otp: "4025"));
               },
               // onTap: ()=>Navigator.of(context).pushNamed(''),
               text: 'Confirm',

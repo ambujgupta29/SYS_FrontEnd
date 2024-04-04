@@ -23,11 +23,11 @@ class BadRequestException extends NetworkException {
 }
 
 class UnauthorisedException extends NetworkException {
-  UnauthorisedException([message]) : super(message, "Unauthorised: ");
+  UnauthorisedException(String message) : super(message, "Unauthorised: ");
 }
 
 class NotFoundException extends NetworkException {
-  NotFoundException([message]) : super(message,'');
+  NotFoundException(String message) : super(message,'');
 }
 
 
