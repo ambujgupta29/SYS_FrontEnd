@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -176,50 +177,95 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                 const SizedBox(
                   height: 40,
                 ),
-                if (_secondsLeft > 0)
-                  Text(
-                    '${00.toString().padLeft(2, '0')}:${_secondsLeft.toString().padLeft(2, '0')}',
-                    style: SysAppTheme().textStyle(
-                      fontSize: SysAppTheme().fontSizeDefaultBody,
-                      fontWeight: SysAppTheme().fontWeightDefaultBody,
-                      color: SysAppTheme().textColor,
-                    ),
-                  )
-                else
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Did not receive OTP?  ',
+                Container(
+                  height: 30,
+                  alignment: Alignment.center,
+                  child: _secondsLeft > 0
+                      ? Text(
+                          '${00.toString().padLeft(2, '0')}:${_secondsLeft.toString().padLeft(2, '0')}',
                           style: SysAppTheme().textStyle(
-                            fontSize: SysAppTheme().fontSizeBannerBody,
+                            fontSize: SysAppTheme().fontSizeDefaultBody,
                             fontWeight: SysAppTheme().fontWeightDefaultBody,
                             color: SysAppTheme().textColor,
                           ),
-                        ),
-                        TextSpan(
-                          text: 'Resend OTP',
-                          style: SysAppTheme()
-                              .textStyle(
-                                fontSize: SysAppTheme().fontSizeBannerBody,
-                                fontWeight:
-                                    SysAppTheme().fontWeightDefaultHeading,
-                                color: SysAppTheme().textColor,
-                              )
-                              .copyWith(
-                                decoration: TextDecoration.underline,
-                                // decorationThickness: 2,
+                        )
+                      : RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Did not receive OTP?  ',
+                                style: SysAppTheme().textStyle(
+                                  fontSize: SysAppTheme().fontSizeBannerBody,
+                                  fontWeight:
+                                      SysAppTheme().fontWeightDefaultBody,
+                                  color: SysAppTheme().textColor,
+                                ),
                               ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () async {
-                              // todo add resend func here
-                              _loginBloc?.add(
-                                  SendOTPEvent(mobileNumber: "8957078301"));
-                            },
+                              TextSpan(
+                                text: 'Resend OTP',
+                                style: SysAppTheme()
+                                    .textStyle(
+                                      fontSize:
+                                          SysAppTheme().fontSizeBannerBody,
+                                      fontWeight: SysAppTheme()
+                                          .fontWeightDefaultHeading,
+                                      color: SysAppTheme().textColor,
+                                    )
+                                    .copyWith(
+                                      decoration: TextDecoration.underline,
+                                      // decorationThickness: 2,
+                                    ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () async {
+                                    // todo add resend func here
+                                    _loginBloc?.add(SendOTPEvent(
+                                        mobileNumber: "8957078301"));
+                                  },
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
+                ),
+                // if (timerMin > 0 || timerSec > 0)
+                //   Text(
+                //     '${timerMin.toString().padLeft(2,'0')}:${timerSec.toString().padLeft(2,'0')}',
+                //     style: SysAppTheme().textStyle(
+                //       fontSize: SysAppTheme().fontSizeDefaultBody,
+                //       fontWeight: SysAppTheme().fontWeightDefaultBody,
+                //       color: SysAppTheme().textColor,
+                //     ),
+                //   )
+                // else
+                //   RichText(
+                //     text: TextSpan(
+                //       children: [
+                //         TextSpan(
+                //           text: 'Did not receive OTP?  ',
+                //           style: SysAppTheme().textStyle(
+                //             fontSize: SysAppTheme().fontSizeBannerBody,
+                //             fontWeight: SysAppTheme().fontWeightDefaultBody,
+                //             color: SysAppTheme().textColor,
+                //           ),
+                //         ),
+                //         TextSpan(
+                //           text: 'Resend OTP',
+                //           style: SysAppTheme().textStyle(
+                //             fontSize: SysAppTheme().fontSizeBannerBody,
+                //             fontWeight: SysAppTheme().fontWeightDefaultHeading,
+                //             color: SysAppTheme().textColor,
+                //           ).copyWith(
+                //             decoration: TextDecoration.underline,
+                //             // decorationThickness: 2,
+                //           ),
+                //           recognizer: TapGestureRecognizer()
+                //             ..onTap = () async {
+                //               // todo add resend func here
+                //               startTimer();
+                //             },
+                //         ),
+                //       ],
+                //     ),
+                //   )
               ],
             ),
             Button(
