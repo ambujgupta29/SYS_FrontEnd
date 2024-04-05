@@ -130,7 +130,17 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: ()=>Navigator.of(context).pushNamed('/login-signup')),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 80),
+        child: FloatingActionButton(
+          onPressed: ()=>Navigator.of(context).pushNamed('/login-signup'),
+          backgroundColor: SysAppTheme().buttonColor,
+          child: Icon(
+            Icons.person_add_rounded,
+            color: SysAppTheme().buttonTextColor,
+          ),
+        ),
+      ),
     );
   }
 }

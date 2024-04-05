@@ -175,6 +175,16 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                   ],
                 ),
                 const SizedBox(
+                  height: 20,
+                ),
+                TextFieldBox(
+                  margin: const EdgeInsets.only(top: 20,),
+                  leadingIcon: Icon(Icons.password_rounded, color: SysAppTheme().textColor,),
+                  leadingDivider: true,
+                  hintText: 'OTP',
+                  maxLength: 4,
+                ),
+                const SizedBox(
                   height: 40,
                 ),
                 Container(
