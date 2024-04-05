@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sys_mobile/bloc/login/login_bloc.dart';
 import 'package:sys_mobile/ui/screens/login/login_otp_screen.dart';
 import 'package:sys_mobile/ui/screens/login/login_phone_screen.dart';
+import 'package:sys_mobile/ui/screens/profile/profile_screen.dart';
 import 'package:sys_mobile/ui/screens/splash/splash_screen.dart';
 
 void main() {
@@ -20,6 +21,7 @@ void main() {
             child: const LoginOtpScreen(),
           ),
       // '/dashboard': (context) => ,
+      '/profile': (context) => const ProfileScreen(),
     },
   ));
 }

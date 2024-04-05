@@ -12,7 +12,7 @@ void stopLoader(BuildContext? context) {
 
 void startLoader(BuildContext? context) {
   if (context!.mounted) {
-    if (_loaderStared || context == null) return;
+    if (_loaderStared) return;
 
     _loaderStared = true;
     Loader.show(context,
