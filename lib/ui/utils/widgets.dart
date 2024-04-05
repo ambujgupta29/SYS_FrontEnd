@@ -5,6 +5,7 @@ Widget TextFieldBox({
   double? height,
   double? width,
   Widget? leadingIcon,
+  bool leadingDivider = false,
   TextEditingController? controller,
   TextStyle? textStyle,
   String? hintText,
@@ -18,11 +19,17 @@ Widget TextFieldBox({
   Color? borderColor,
   bool hasShadow = false,
   Color? shadowColor,
+  EdgeInsets? margin,
   EdgeInsets? padding,
   TextAlign? textAlign,
+  String? label,
 }){
   return Container(
-    padding: padding ?? const EdgeInsets.symmetric(horizontal: 25),
+    margin: margin,
+    padding: padding ?? EdgeInsets.only(
+        left: leadingIcon != null ? 5 : 25,
+        right: 25,
+    ),
     height: height,
     width: width,
     alignment: Alignment.center,
@@ -47,10 +54,18 @@ Widget TextFieldBox({
       children: [
         if (leadingIcon != null)
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15,
+            padding: EdgeInsets.only(
+              left: 15,
+              right: leadingDivider ? 0 : 15,
             ),
             child: leadingIcon,
+          ),
+        if (leadingIcon != null && leadingDivider)
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 15),
+            height: 24,
+            width: 1,
+            color: SysAppTheme().borderGrey,
           ),
         Flexible(
           child: TextField(

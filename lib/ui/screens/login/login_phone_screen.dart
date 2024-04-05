@@ -105,14 +105,9 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
                           color: SysAppTheme().textColor,
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(left: 15),
-                        height: 24,
-                        width: 1,
-                        color: SysAppTheme().borderGrey,
-                      )
                     ],
                   ),
+                  leadingDivider: true,
                 ),
               ],
             ),
@@ -135,6 +130,7 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(onPressed: ()=>Navigator.of(context).pushNamed('/login-signup')),
     );
   }
 }
