@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -160,20 +161,20 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 40,
-                ),
-                if (timerMin > 0 || timerSec > 0)
-                  Text(
-                    '${timerMin.toString().padLeft(2, '0')}:${timerSec.toString().padLeft(2, '0')}',
+                const SizedBox(height: 40,),
+                Container(
+                  height: 30,
+                  alignment: Alignment.center,
+                  child: timerMin > 0 || timerSec > 0
+                      ? Text(
+                    '${timerMin.toString().padLeft(2,'0')}:${timerSec.toString().padLeft(2,'0')}',
                     style: SysAppTheme().textStyle(
                       fontSize: SysAppTheme().fontSizeDefaultBody,
                       fontWeight: SysAppTheme().fontWeightDefaultBody,
                       color: SysAppTheme().textColor,
                     ),
                   )
-                else
-                  RichText(
+                      : RichText(
                     text: TextSpan(
                       children: [
                         TextSpan(
@@ -208,6 +209,47 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                       ],
                     ),
                   ),
+                ),
+                // if (timerMin > 0 || timerSec > 0)
+                //   Text(
+                //     '${timerMin.toString().padLeft(2,'0')}:${timerSec.toString().padLeft(2,'0')}',
+                //     style: SysAppTheme().textStyle(
+                //       fontSize: SysAppTheme().fontSizeDefaultBody,
+                //       fontWeight: SysAppTheme().fontWeightDefaultBody,
+                //       color: SysAppTheme().textColor,
+                //     ),
+                //   )
+                // else
+                //   RichText(
+                //     text: TextSpan(
+                //       children: [
+                //         TextSpan(
+                //           text: 'Did not receive OTP?  ',
+                //           style: SysAppTheme().textStyle(
+                //             fontSize: SysAppTheme().fontSizeBannerBody,
+                //             fontWeight: SysAppTheme().fontWeightDefaultBody,
+                //             color: SysAppTheme().textColor,
+                //           ),
+                //         ),
+                //         TextSpan(
+                //           text: 'Resend OTP',
+                //           style: SysAppTheme().textStyle(
+                //             fontSize: SysAppTheme().fontSizeBannerBody,
+                //             fontWeight: SysAppTheme().fontWeightDefaultHeading,
+                //             color: SysAppTheme().textColor,
+                //           ).copyWith(
+                //             decoration: TextDecoration.underline,
+                //             // decorationThickness: 2,
+                //           ),
+                //           recognizer: TapGestureRecognizer()
+                //             ..onTap = () async {
+                //               // todo add resend func here
+                //               startTimer();
+                //             },
+                //         ),
+                //       ],
+                //     ),
+                //   )
               ],
             ),
             Button(
