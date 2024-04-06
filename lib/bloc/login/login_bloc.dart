@@ -25,6 +25,9 @@ class LoginBloc extends BaseBloc<LoginEvent, LoginState> {
     if (event is SendOTPEvent) {
       yield* _handleSendOTPEvent(event);
     }
+    if (event is UserSignupEvent) {
+      yield* _handleUserSignupEvent(event);
+    }
   }
 
   Stream<LoginState> _handleMobileNumberExistEvent(
@@ -90,6 +93,25 @@ class LoginBloc extends BaseBloc<LoginEvent, LoginState> {
       }
     } on Exception catch (ex) {
       yield SendOTPFailedState(ex.toString());
+    }
+  }
+
+  Stream<LoginState> _handleUserSignupEvent(UserSignupEvent event) async* {
+    yield UserSignupProgressState();
+    try {
+      Map<String, dynamic> body = {
+        'mobileNumber': event.mobileNumber,
+        'fullName': event.fullName,
+        'userName': event.username,
+        'email': event.email,
+      };
+      final Response response = await LoginRepository().userSignup(body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        String message = (response.data['message']);
+        yield UserSignupSuccessState(message);
+      }
+    } on Exception catch (ex) {
+      yield UserSignupFailedState(ex.toString());
     }
   }
 }

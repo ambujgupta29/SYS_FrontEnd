@@ -22,20 +22,26 @@ class LoginRepository {
   }
 
   Future<Response> userLogin(Map<String, dynamic> body) async {
-    var response = await apiBaseHelper.post(
-        url: ApiServieUrl.userLogin, body: body);
+    var response =
+        await apiBaseHelper.post(url: ApiServieUrl.userLogin, body: body);
     return response;
   }
 
   Future<Response> verifyOTP(Map<String, dynamic> body) async {
-    var response = await apiBaseHelper.post(
-        url: ApiServieUrl.verifyOTP, body: body);
+    var response =
+        await apiBaseHelper.post(url: ApiServieUrl.verifyOTP, body: body);
     return response;
   }
 
   Future<Response> sendOTP(Map<String, dynamic> body) async {
-    var response = await apiBaseHelper.post(
-        url: ApiServieUrl.sendOTP, body: body);
+    var response =
+        await apiBaseHelper.post(url: ApiServieUrl.sendOTP, body: body);
+    return response;
+  }
+
+  Future<Response> userSignup(Map<String, dynamic> body) async {
+    var response =
+        await apiBaseHelper.post(url: ApiServieUrl.userSignup, body: body);
     return response;
   }
 }

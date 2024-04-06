@@ -13,7 +13,8 @@ class ProfileCardModel {
 }
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final dynamic arguments;
+  const ProfileScreen({super.key, this.arguments});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();

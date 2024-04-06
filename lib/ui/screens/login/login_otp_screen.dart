@@ -3,22 +3,27 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sys_mobile/bloc/login/login_bloc.dart';
 import 'package:sys_mobile/bloc/login/login_event.dart';
 import 'package:sys_mobile/bloc/login/login_state.dart';
 import 'package:sys_mobile/common/loader_control.dart';
+import 'package:sys_mobile/ui/utils/store/app_storage.dart';
+import 'package:sys_mobile/ui/utils/store/storage_constants.dart';
 import 'package:sys_mobile/ui/utils/theme.dart';
 import 'package:sys_mobile/ui/utils/widgets.dart';
 
 class LoginOtpScreen extends StatefulWidget {
-  const LoginOtpScreen({super.key});
+  final dynamic arguments;
+  const LoginOtpScreen({super.key, this.arguments});
 
   @override
   State<LoginOtpScreen> createState() => _LoginOtpScreenState();
 }
 
 class _LoginOtpScreenState extends State<LoginOtpScreen> {
+  TextEditingController? otpController = TextEditingController();
   LoginBloc? _loginBloc;
   int _secondsLeft = 30;
   late Timer _timer;
@@ -48,6 +53,11 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
       stopLoader(context);
       print(state.verifyOTPModel.message);
       print(state.verifyOTPModel.accessToken);
+      await AppStorage()
+          .putString(USER_TOKEN, state.verifyOTPModel.accessToken ?? '');
+      AppStorage().putBool(IS_LOGGED_IN, true);
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('/bottom-nav', ModalRoute.withName(''));
     } else if (state is VerifyOTPFailedState) {
       stopLoader(context);
       print(state.message);
@@ -175,6 +185,22 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                   ],
                 ),
                 const SizedBox(
+                  height: 20,
+                ),
+                TextFieldBox(
+                  controller: otpController,
+                  margin: const EdgeInsets.only(
+                    top: 20,
+                  ),
+                  leadingIcon: Icon(
+                    Icons.password_rounded,
+                    color: SysAppTheme().textColor,
+                  ),
+                  leadingDivider: true,
+                  hintText: 'OTP',
+                  maxLength: 4,
+                ),
+                const SizedBox(
                   height: 40,
                 ),
                 Container(
@@ -193,7 +219,7 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                           text: TextSpan(
                             children: [
                               TextSpan(
-                                text: 'Did not receive OTP?  ',
+                                text: 'Did not receive OTP?   ',
                                 style: SysAppTheme().textStyle(
                                   fontSize: SysAppTheme().fontSizeBannerBody,
                                   fontWeight:
@@ -219,7 +245,8 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                                   ..onTap = () async {
                                     // todo add resend func here
                                     _loginBloc?.add(SendOTPEvent(
-                                        mobileNumber: "8957078301"));
+                                        mobileNumber:
+                                            widget.arguments['mobileNumber']));
                                   },
                               ),
                             ],
@@ -270,8 +297,9 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
             ),
             Button(
               onTap: () {
-                _loginBloc?.add(
-                    VerifyOTPEvent(mobileNumber: "8957078301", otp: "4025"));
+                _loginBloc?.add(VerifyOTPEvent(
+                    mobileNumber: widget.arguments['mobileNumber'],
+                    otp: otpController?.text ?? ''));
               },
               // onTap: ()=>Navigator.of(context).pushNamed(''),
               text: 'Confirm',

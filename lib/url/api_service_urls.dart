@@ -3,7 +3,8 @@ class ApiServieUrl {
 
   static String mobileNumberExist =
       '${ApiServieUrl().domainName}/users/isExistingUser';
-  static String userLogin = '${ApiServieUrl().domainName}/auth/login';
+  static String userLogin = '${ApiServieUrl().domainName}/sms/sendOtp';
+  static String userSignup = '${ApiServieUrl().domainName}/users/';
   static String verifyOTP = '${ApiServieUrl().domainName}/auth/verify-otp';
-  static String sendOTP = '${ApiServieUrl().domainName}/auth/sendOtp';
+  static String sendOTP = '${ApiServieUrl().domainName}/sms/sendOtp';
 }

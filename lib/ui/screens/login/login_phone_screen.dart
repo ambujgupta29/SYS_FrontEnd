@@ -5,6 +5,8 @@ import 'package:sys_mobile/bloc/login/login_event.dart';
 import 'package:sys_mobile/bloc/login/login_state.dart';
 import 'package:sys_mobile/common/loader_control.dart';
 import 'package:sys_mobile/ui/utils/app_images.dart';
+import 'package:sys_mobile/ui/utils/store/app_storage.dart';
+import 'package:sys_mobile/ui/utils/store/storage_constants.dart';
 import 'package:sys_mobile/ui/utils/theme.dart';
 import 'package:sys_mobile/ui/utils/widgets.dart';
 
@@ -33,9 +35,11 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
       if (state.message == true) {
         _loginBloc
             ?.add(UserLoginEvent(mobileNumber: mobileNumberController.text));
-        Navigator.of(context).pushNamed('/login-otp');
+        Navigator.of(context).pushNamed('/login-otp',
+            arguments: {'mobileNumber': mobileNumberController.text});
       } else {
-        //Navigate to SignUp Screen
+        Navigator.of(context).pushNamed('/login-signup',
+            arguments: {'mobileNumber': mobileNumberController.text});
       }
     } else if (state is MobileNumberExistFailedState) {
       print(state.message);
@@ -105,14 +109,9 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
                           color: SysAppTheme().textColor,
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(left: 15),
-                        height: 24,
-                        width: 1,
-                        color: SysAppTheme().borderGrey,
-                      )
                     ],
                   ),
+                  leadingDivider: true,
                 ),
               ],
             ),
@@ -135,6 +134,17 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
           ],
         ),
       ),
+      // floatingActionButton: Padding(
+      //   padding: const EdgeInsets.only(bottom: 80),
+      //   child: FloatingActionButton(
+      //     onPressed: () => Navigator.of(context).pushNamed('/login-signup'),
+      //     backgroundColor: SysAppTheme().buttonColor,
+      //     child: Icon(
+      //       Icons.person_add_rounded,
+      //       color: SysAppTheme().buttonTextColor,
+      //     ),
+      //   ),
+      // ),
     );
   }
 }

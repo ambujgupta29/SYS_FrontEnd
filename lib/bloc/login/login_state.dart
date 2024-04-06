@@ -63,3 +63,19 @@ class SendOTPSuccessState extends LoginState {
   SendOTPSuccessState(this.message);
 }
 
+// user signup
+
+
+class UserSignupProgressState extends LoginState {}
+
+class UserSignupFailedState extends LoginState {
+  String message;
+  UserSignupFailedState(this.message);
+}
+
+class UserSignupSuccessState extends LoginState {
+  String message;
+  UserSignupSuccessState(this.message);
+}
+
+

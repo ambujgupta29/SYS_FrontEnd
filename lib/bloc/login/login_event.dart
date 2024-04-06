@@ -22,9 +22,23 @@ class VerifyOTPEvent extends LoginEvent {
   VerifyOTPEvent({required this.mobileNumber, required this.otp});
 }
 
-//
+// send OTP
 
 class SendOTPEvent extends LoginEvent {
   String mobileNumber;
   SendOTPEvent({required this.mobileNumber});
+}
+
+//user Signup
+class UserSignupEvent extends LoginEvent {
+  String mobileNumber;
+  String username;
+  String fullName;
+  String email;
+
+  UserSignupEvent(
+      {required this.mobileNumber,
+      required this.fullName,
+      required this.email,
+      required this.username});
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sys_mobile/ui/utils/store/app_storage.dart';
+import 'package:sys_mobile/ui/utils/store/storage_constants.dart';
 import 'package:sys_mobile/ui/utils/theme.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -14,9 +16,16 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     SysAppTheme().setTheme(SysAppThemes.light);
-    Future.delayed(const Duration(milliseconds: 3000),()=>Navigator.of(context).pushNamed('/login-phone'));
+    final isloggedin = AppStorage().getBool(IS_LOGGED_IN) ?? false;
+    Future.delayed(
+        const Duration(milliseconds: 3000),
+        () => (!isloggedin)
+            ? Navigator.of(context).pushNamed('/login-phone')
+            : Navigator.of(context).pushNamedAndRemoveUntil(
+                '/bottom-nav', ModalRoute.withName('')));
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,12 +36,12 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             GestureDetector(
-              onTap: (){
+              onTap: () {
                 setState(() {
                   SysAppTheme().setTheme(SysAppThemes.light);
                 });
                 // Navigator.of(context).pushNamed('/login-phone');
-                },
+              },
               child: Text(
                 'Hi',
                 style: SysAppTheme().textStyle(
