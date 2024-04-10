@@ -17,31 +17,31 @@ class LoginRepository {
 
   Future<Response> isExistingUser(Map<String, dynamic> body) async {
     var response = await apiBaseHelper.post(
-        url: ApiServieUrl.mobileNumberExist, body: body);
+        url: ApiServiceUrl.mobileNumberExist, body: body);
     return response;
   }
 
   Future<Response> userLogin(Map<String, dynamic> body) async {
     var response =
-        await apiBaseHelper.post(url: ApiServieUrl.userLogin, body: body);
+        await apiBaseHelper.post(url: ApiServiceUrl.userLogin, body: body);
     return response;
   }
 
   Future<Response> verifyOTP(Map<String, dynamic> body) async {
     var response =
-        await apiBaseHelper.post(url: ApiServieUrl.verifyOTP, body: body);
+        await apiBaseHelper.post(url: ApiServiceUrl.verifyOTP, body: body);
     return response;
   }
 
   Future<Response> sendOTP(Map<String, dynamic> body) async {
     var response =
-        await apiBaseHelper.post(url: ApiServieUrl.sendOTP, body: body);
+        await apiBaseHelper.post(url: ApiServiceUrl.sendOTP, body: body);
     return response;
   }
 
   Future<Response> userSignup(Map<String, dynamic> body) async {
     var response =
-        await apiBaseHelper.post(url: ApiServieUrl.userSignup, body: body);
+        await apiBaseHelper.post(url: ApiServiceUrl.userSignup, body: body);
     return response;
   }
 }

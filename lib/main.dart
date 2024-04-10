@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sys_mobile/bloc/login/login_bloc.dart';
+import 'package:sys_mobile/bloc/login/product/product_bloc.dart';
 import 'package:sys_mobile/ui/screens/bottom_nav_bar/bottom_nav_bar.dart';
 import 'package:sys_mobile/ui/screens/login/login_otp_screen.dart';
 import 'package:sys_mobile/ui/screens/login/login_phone_screen.dart';
+import 'package:sys_mobile/ui/screens/productDetail/product_detail_screen.dart';
 import 'package:sys_mobile/ui/screens/profile/profile_screen.dart';
 import 'package:sys_mobile/ui/screens/login/login_signup_screen.dart';
 import 'package:sys_mobile/ui/screens/splash/splash_screen.dart';
@@ -18,37 +21,47 @@ void main() async {
     MaterialApp(
       onGenerateRoute: (settings) {
         if (settings.name == '/') {
-          return MaterialPageRoute(builder: (context) {
+          return CupertinoPageRoute(builder: (context) {
             return SplashScreen();
           });
         } else if (settings.name == '/login-phone') {
-          return MaterialPageRoute(builder: (context) {
+          return CupertinoPageRoute(builder: (context) {
             return BlocProvider(
               create: (context) => LoginBloc(),
               child: LoginPhoneScreen(),
             );
           });
         } else if (settings.name == '/login-signup') {
-          return MaterialPageRoute(builder: (context) {
+          return CupertinoPageRoute(builder: (context) {
             return BlocProvider(
               create: (context) => LoginBloc(),
               child: LoginSignupScreen(arguments: settings.arguments),
             );
           });
         } else if (settings.name == '/login-otp') {
-          return MaterialPageRoute(builder: (context) {
+          return CupertinoPageRoute(builder: (context) {
             return BlocProvider(
               create: (context) => LoginBloc(),
               child: LoginOtpScreen(arguments: settings.arguments),
             );
           });
-        } else if (settings.name == 'profile') {
-          return MaterialPageRoute(builder: (context) {
+        } else if (settings.name == '/profile') {
+          return CupertinoPageRoute(builder: (context) {
             return ProfileScreen(arguments: settings.arguments);
           });
         } else if (settings.name == '/bottom-nav') {
-          return MaterialPageRoute(builder: (context) {
-            return BottomNavBarScreen(arguments: settings.arguments);
+          return CupertinoPageRoute(builder: (context) {
+            return BlocProvider(
+              create: (context) => ProductsBloc(),
+              child: BottomNavBarScreen(arguments: settings.arguments),
+            );
+          });
+        } else if (settings.name == '/product-detail') {
+          return CupertinoPageRoute(builder: (context) {
+            return BlocProvider(
+              create: (context) => ProductsBloc(),
+              child: ProductDetailScreen(arguments: settings.arguments),
+            );
           });
         }
       },

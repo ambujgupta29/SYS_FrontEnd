@@ -1,0 +1,51 @@
+import 'package:sys_mobile/common/screen_state.dart';
+import 'package:sys_mobile/models/products/fetch_image_model.dart';
+import 'package:sys_mobile/models/products/fetch_multiple_images_model.dart';
+import 'package:sys_mobile/models/products/fetch_product_model.dart';
+
+abstract class ProductState extends ScreenState {}
+
+class ProductInitial extends ProductState {}
+
+class ProductFailedState extends ProductState {}
+
+//Fetch all Product
+
+class FetchAllProductProgressState extends ProductState {}
+
+class FetchAllProductFailedState extends ProductState {
+  String message;
+  FetchAllProductFailedState(this.message);
+}
+
+class FetchAllProductSuccessState extends ProductState {
+  FetchProductModel fetchProductModel;
+  FetchAllProductSuccessState(this.fetchProductModel);
+}
+
+//fetch image
+
+class FetchImageProgressState extends ProductState {}
+
+class FetchImageFailedState extends ProductState {
+  String message;
+  FetchImageFailedState(this.message);
+}
+
+class FetchImageSuccessState extends ProductState {
+  FetchImageModel fetchImageModel;
+  FetchImageSuccessState(this.fetchImageModel);
+}
+
+class FetchMultipleImagesProgressState extends ProductState {}
+
+class FetchMultipleImagesFailedState extends ProductState {
+  String message;
+  FetchMultipleImagesFailedState(this.message);
+}
+
+class FetchMultipleImagesSuccessState extends ProductState {
+  FetchMultipleImagesModel fetchMultipleImagesModel;
+  FetchMultipleImagesSuccessState(this.fetchMultipleImagesModel);
+}
+
