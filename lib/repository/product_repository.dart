@@ -17,10 +17,11 @@ class ProductRepository {
 
   static ProductRepository get instance => _this;
 
-  Future<Response> fetchAllProducts() async {
+  Future<Response> fetchAllProducts(Map<String, dynamic> body) async {
     final token = await AppStorage().getString(USER_TOKEN);
-    var response = await apiBaseHelper.get(
+    var response = await apiBaseHelper.post(
         url: ApiServiceUrl.fetchAllProducts,
+        body: body,
         options: Options(headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -28,7 +29,7 @@ class ProductRepository {
     return response;
   }
 
-  Future<Response> fetchImage(Map<String,dynamic> body) async {
+  Future<Response> fetchImage(Map<String, dynamic> body) async {
     final token = await AppStorage().getString(USER_TOKEN);
     var response = await apiBaseHelper.post(
         url: ApiServiceUrl.fetchImage,
@@ -39,7 +40,8 @@ class ProductRepository {
         }));
     return response;
   }
-  Future<Response> fetchMultipleImages(Map<String,dynamic> body) async {
+
+  Future<Response> fetchMultipleImages(Map<String, dynamic> body) async {
     final token = await AppStorage().getString(USER_TOKEN);
     var response = await apiBaseHelper.post(
         url: ApiServiceUrl.fetchMultipleImages,
@@ -51,5 +53,25 @@ class ProductRepository {
     return response;
   }
 
- 
+  Future<Response> postProduct(FormData body) async {
+    final token = await AppStorage().getString(USER_TOKEN);
+    var response = await apiBaseHelper.postformdata(
+        url: ApiServiceUrl.postProduct,
+        body: body,
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }));
+    return response;
+  }
+
+  Future<Response> getuserPost() async {
+    final token = await AppStorage().getString(USER_TOKEN);
+    var response = await apiBaseHelper.get(
+        url: ApiServiceUrl.getuserPost,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }));
+    return response;
+  }
 }

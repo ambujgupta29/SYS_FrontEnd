@@ -29,8 +29,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     // TODO: implement initState
     _productsBloc = BlocProvider.of(context);
     print(json.encode(widget.arguments['productModel']));
-    _productsBloc?.add(FetchMultipleImagesEvent(
-        fileName: widget.arguments['productModel'].images));
+    // _productsBloc?.add(FetchMultipleImagesEvent(
+    //     fileName: widget.arguments['productModel'].images));
 
     super.initState();
   }
@@ -53,128 +53,52 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       flex: 6,
                       child: Stack(
                         children: [
-                          BlocBuilder<ProductsBloc, ProductState>(
-                            buildWhen: (ProductState prevState,
-                                ProductState currentState) {
-                              return currentState
-                                      is FetchMultipleImagesSuccessState ||
-                                  currentState
-                                      is FetchMultipleImagesFailedState ||
-                                  currentState
-                                      is FetchMultipleImagesProgressState;
-                            },
-                            builder: (context, state) {
-                              if (state is FetchMultipleImagesSuccessState) {
-                                images =
-                                    state.fetchMultipleImagesModel.files?.map(
-                                  (e) {
-                                    return e.value ?? '';
-                                  },
-                                ).toList();
-                                return FlutterCarousel(
-                                  items: (images ?? [])
-                                      .map(
-                                        (e) => Builder(builder: (context) {
-                                          return Container(
-                                            width: double.infinity,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(20),
-                                              ),
-                                              child: Image.network(e,
-                                                  fit: BoxFit.cover),
-                                            ),
-                                          );
-                                        }),
-                                      )
-                                      .toList(),
-                                  options: CarouselOptions(
-                                    height: 400.0,
-                                    showIndicator: true,
-                                    viewportFraction: 1.0,
-                                    initialPage: 0,
-                                    enableInfiniteScroll: true,
-                                    reverse: false,
-                                    autoPlay: true,
-                                    autoPlayInterval: Duration(seconds: 5),
-                                    autoPlayAnimationDuration:
-                                        Duration(milliseconds: 800),
-                                    autoPlayCurve: Curves.fastOutSlowIn,
-                                    enlargeCenterPage: true,
-                                    slideIndicator: CircularSlideIndicator(),
-                                  ),
-                                );
-
-                                // Container(
-                                //   child: Text(json.encode(state.fetchProductModel)),
-                                // );
-                              } else if (state
-                                  is FetchMultipleImagesFailedState) {
-                                return Container(
-                                  child: Text(state.message),
-                                );
-                              } else if (state
-                                  is FetchMultipleImagesProgressState) {
-                                return CircularProgressIndicator();
-                              } else {
-                                return Container(
-                                  child: Text("hello"),
-                                );
-                              }
-                            },
+                          FlutterCarousel(
+                            items: (widget.arguments['productModel'].images
+                                        as List<String> ??
+                                    [])
+                                .map(
+                                  (e) => Builder(builder: (context) {
+                                    return Container(
+                                      width: double.infinity,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
+                                        child:
+                                            Image.network(e, fit: BoxFit.cover),
+                                      ),
+                                    );
+                                  }),
+                                )
+                                .toList(),
+                            options: CarouselOptions(
+                              height: 400.0,
+                              showIndicator: true,
+                              viewportFraction: 1.0,
+                              initialPage: 0,
+                              enableInfiniteScroll: true,
+                              reverse: false,
+                              autoPlay: true,
+                              autoPlayInterval: Duration(seconds: 5),
+                              autoPlayAnimationDuration:
+                                  Duration(milliseconds: 800),
+                              autoPlayCurve: Curves.fastOutSlowIn,
+                              enlargeCenterPage: true,
+                              slideIndicator: CircularSlideIndicator(),
+                            ),
                           ),
-                          // FlutterCarousel(
-                          //   items: [
-                          //     'lib/assets/images/model.png',
-                          //     'lib/assets/images/model.png',
-                          //     'lib/assets/images/model.png'
-                          //   ]
-                          //       .map(
-                          //         (e) => Builder(builder: (context) {
-                          //           return Container(
-                          //             width: double.infinity,
-                          //             child: ClipRRect(
-                          //               borderRadius: BorderRadius.all(
-                          //                 Radius.circular(20),
-                          //               ),
-                          //               child:
-                          //                   Image.asset(e, fit: BoxFit.cover),
-                          //             ),
-                          //           );
-                          //         }),
-                          //       )
-                          //       .toList(),
-                          //   options: CarouselOptions(
-                          //     height: 400.0,
-                          //     showIndicator: true,
-                          //     viewportFraction: 1.0,
-                          //     initialPage: 0,
-                          //     enableInfiniteScroll: true,
-                          //     reverse: false,
-                          //     autoPlay: true,
-                          //     autoPlayInterval: Duration(seconds: 5),
-                          //     autoPlayAnimationDuration:
-                          //         Duration(milliseconds: 800),
-                          //     autoPlayCurve: Curves.fastOutSlowIn,
-                          //     enlargeCenterPage: true,
-                          //     slideIndicator: CircularSlideIndicator(),
-                          //   ),
-                          // ),
-
                           Positioned(
                             right: 12,
                             top: 12,
                             child: GestureDetector(
                               onTap: () {},
                               child: CircleAvatar(
-                                  radius: 22,
-                                  backgroundColor: Colors.white,
-                                  child:
-                                      // !isItemAddedtoWishlist
-                                      //     ? AppImages.isNotFavourite(context)
-                                      // :
-                                      AppImages.isFavouriteBlack(context,
-                                          height: 25)),
+                                radius: 22,
+                                backgroundColor: Colors.white,
+                                child: AppImages.isFavouriteBlack(context,
+                                    height: 25),
+                              ),
                             ),
                           ),
                           Positioned(
@@ -372,7 +296,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       Padding(
                         padding: EdgeInsets.only(left: 10.0),
                         child: Text(
-                          "Add to Cart | ${widget.arguments['productModel'].productPrice}",
+                          "Add to Cart | ₹ ${widget.arguments['productModel'].productPrice}",
                           style: GoogleFonts.encodeSans(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,

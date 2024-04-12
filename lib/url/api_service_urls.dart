@@ -7,7 +7,14 @@ class ApiServiceUrl {
   static String userSignup = '${ApiServiceUrl().domainName}/users/';
   static String verifyOTP = '${ApiServiceUrl().domainName}/auth/verify-otp';
   static String sendOTP = '${ApiServiceUrl().domainName}/sms/sendOtp';
-  static String fetchAllProducts = '${ApiServiceUrl().domainName}/product';
+  static String fetchAllProducts =
+      '${ApiServiceUrl().domainName}/product/search';
   static String fetchImage = '${ApiServiceUrl().domainName}/upload/getFile';
-  static String fetchMultipleImages = '${ApiServiceUrl().domainName}/upload/getMultipleFiles';
+  static String fetchMultipleImages =
+      '${ApiServiceUrl().domainName}/upload/getMultipleFiles';
+  static String postProduct = '${ApiServiceUrl().domainName}/product';
+  static String getuserPost = '${ApiServiceUrl().domainName}/product/User';
+  static String getProfilePic = '${ApiServiceUrl().domainName}/users/profilepic';
+  static String uploadProfilePic = '${ApiServiceUrl().domainName}/users/profilepic';
+  
 }

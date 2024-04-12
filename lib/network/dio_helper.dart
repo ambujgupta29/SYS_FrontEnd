@@ -68,6 +68,42 @@ class ApiBaseHelper {
     }
   }
 
+  Future<Response> patch(
+      {String? url, Map<String, dynamic>? body, Options? options}) async {
+    try {
+      final response = await dioFactory.getDio().patch(
+            url!,
+            data: body,
+            options: options,
+          );
+
+      return _returnResponse(response);
+    } on DioException catch (ex) {
+      if (ex.type == DioExceptionType.connectionError) {
+        throw NoInternetException('');
+      }
+      return _returnResponse(ex.response);
+    }
+  }
+
+  Future<Response> patchFormData(
+      {String? url, FormData? body, Options? options}) async {
+    try {
+      final response = await dioFactory.getDio().patch(
+            url!,
+            data: body,
+            options: options,
+          );
+
+      return _returnResponse(response);
+    } on DioException catch (ex) {
+      if (ex.type == DioExceptionType.connectionError) {
+        throw NoInternetException('');
+      }
+      return _returnResponse(ex.response);
+    }
+  }
+
   Future<Response> postformdata(
       {String? url, FormData? body, Options? options}) async {
     try {

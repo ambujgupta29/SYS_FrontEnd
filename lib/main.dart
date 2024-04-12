@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sys_mobile/bloc/login/login_bloc.dart';
 import 'package:sys_mobile/bloc/login/product/product_bloc.dart';
+import 'package:sys_mobile/bloc/profile/profile_bloc.dart';
 import 'package:sys_mobile/ui/screens/bottom_nav_bar/bottom_nav_bar.dart';
 import 'package:sys_mobile/ui/screens/login/login_otp_screen.dart';
 import 'package:sys_mobile/ui/screens/login/login_phone_screen.dart';
@@ -10,6 +11,7 @@ import 'package:sys_mobile/ui/screens/productDetail/product_detail_screen.dart';
 import 'package:sys_mobile/ui/screens/profile/profile_screen.dart';
 import 'package:sys_mobile/ui/screens/login/login_signup_screen.dart';
 import 'package:sys_mobile/ui/screens/splash/splash_screen.dart';
+import 'package:sys_mobile/ui/screens/user_product_list_screen.dart';
 import 'package:sys_mobile/ui/utils/store/app_storage.dart';
 import 'package:sys_mobile/ui/utils/store/storage_constants.dart';
 
@@ -47,12 +49,22 @@ void main() async {
           });
         } else if (settings.name == '/profile') {
           return CupertinoPageRoute(builder: (context) {
-            return ProfileScreen(arguments: settings.arguments);
+            return BlocProvider(
+              create: (context) => ProfileBloc(),
+              child: ProfileScreen(arguments: settings.arguments),
+            );
           });
         } else if (settings.name == '/bottom-nav') {
           return CupertinoPageRoute(builder: (context) {
-            return BlocProvider(
-              create: (context) => ProductsBloc(),
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider<ProductsBloc>(
+                  create: (BuildContext context) => ProductsBloc(),
+                ),
+                BlocProvider<ProfileBloc>(
+                  create: (BuildContext context) => ProfileBloc(),
+                ),
+              ],
               child: BottomNavBarScreen(arguments: settings.arguments),
             );
           });
@@ -61,6 +73,13 @@ void main() async {
             return BlocProvider(
               create: (context) => ProductsBloc(),
               child: ProductDetailScreen(arguments: settings.arguments),
+            );
+          });
+        } else if (settings.name == '/UserproductListing') {
+          return CupertinoPageRoute(builder: (context) {
+            return BlocProvider(
+              create: (context) => ProductsBloc(),
+              child: UserProductListScreen(arguments: settings.arguments),
             );
           });
         }

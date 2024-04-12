@@ -23,6 +23,20 @@ class FetchAllProductSuccessState extends ProductState {
   FetchAllProductSuccessState(this.fetchProductModel);
 }
 
+//fetch product by user
+
+class FetchUserProductsProgressState extends ProductState {}
+
+class FetchUserProductsFailedState extends ProductState {
+  String message;
+  FetchUserProductsFailedState(this.message);
+}
+
+class FetchUserProductsSuccessState extends ProductState {
+  FetchProductModel fetchProductModel;
+  FetchUserProductsSuccessState(this.fetchProductModel);
+}
+
 //fetch image
 
 class FetchImageProgressState extends ProductState {}
@@ -49,3 +63,14 @@ class FetchMultipleImagesSuccessState extends ProductState {
   FetchMultipleImagesSuccessState(this.fetchMultipleImagesModel);
 }
 
+class PostProductProgressState extends ProductState {}
+
+class PostProductFailedState extends ProductState {
+  String message;
+  PostProductFailedState(this.message);
+}
+
+class PostProductSuccessState extends ProductState {
+  String message;
+  PostProductSuccessState(this.message);
+}

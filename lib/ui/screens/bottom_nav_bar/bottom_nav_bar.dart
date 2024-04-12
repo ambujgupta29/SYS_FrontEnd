@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:sys_mobile/ui/screens/addPost/addPost_screen.dart';
 import 'package:sys_mobile/ui/screens/home/home_screen.dart';
+import 'package:sys_mobile/ui/screens/profile/profile_screen.dart';
 import 'package:sys_mobile/ui/utils/app_images.dart';
 
 class BottomNavBarScreen extends StatefulWidget {
@@ -18,9 +20,9 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   final List<Widget> _tabs = [
     HomeScreen(),
     Text('likes Page'),
-    Text('add Page'),
+    AddPostScreen(),
     Text('cart Page'),
-    Text('profile Page'),
+    ProfileScreen()
   ];
 
   // Function to handle tab selection
@@ -43,7 +45,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
         ),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          showSelectedLabels: true,
+          showSelectedLabels: false,
           showUnselectedLabels: false,
           backgroundColor: Color(0xFF292526),
           currentIndex: _selectedIndex,

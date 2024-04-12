@@ -1,8 +1,6 @@
-import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,8 +8,11 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:sys_mobile/bloc/login/product/product_bloc.dart';
 import 'package:sys_mobile/bloc/login/product/product_event.dart';
 import 'package:sys_mobile/bloc/login/product/product_state.dart';
+import 'package:sys_mobile/bloc/profile/profile_bloc.dart';
+import 'package:sys_mobile/bloc/profile/profile_event.dart';
+import 'package:sys_mobile/bloc/profile/profile_state.dart';
+
 import 'package:sys_mobile/common/loader_control.dart';
-import 'package:sys_mobile/models/products/fetch_product_model.dart';
 import 'package:sys_mobile/ui/utils/app_images.dart';
 import 'package:sys_mobile/ui/utils/store/app_storage.dart';
 import 'package:sys_mobile/ui/utils/store/storage_constants.dart';
@@ -26,16 +27,25 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   ProductsBloc? _productsBloc;
+  ProfileBloc? _profileBloc;
   Map<String, dynamic>? decodedToken;
   String? imageurl;
+  Timer? _debounceTimer;
   @override
   void initState() {
-    // TODO: implement initState
     _productsBloc = BlocProvider.of(context);
-    _productsBloc?.add(FetchAllProductsEvent());
+    _profileBloc = BlocProvider.of(context);
+    _productsBloc?.add(FetchAllProductsEvent(productName: ''));
+    _profileBloc?.add(GetProfilePictureEvent());
     decodedToken = JwtDecoder.decode(AppStorage().getString(USER_TOKEN));
     print(decodedToken);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 
   bool isItemAddedtoWishlist = false;
@@ -66,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Padding(
                             padding: EdgeInsets.only(top: 2.0),
                             child: Text(
-                              decodedToken?['fullname']??'NA',
+                              decodedToken?['fullname'] ?? 'NA',
                               style: GoogleFonts.encodeSans(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -75,10 +85,63 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      CircleAvatar(
-                        radius: 27,
-                        child: Image.asset('lib/assets/images/model.png',
-                            fit: BoxFit.cover),
+                      BlocBuilder<ProfileBloc, ProfileState>(
+                        buildWhen: (ProfileState prevState,
+                            ProfileState currentState) {
+                          return currentState
+                                  is GetProfilePictureSuccessState ||
+                              currentState is GetProfilePictureFailedState ||
+                              currentState is GetProfilePictureProgressState;
+                        },
+                        builder: (context, state) {
+                          if (state is GetProfilePictureSuccessState) {
+                            return ClipOval(
+                              child: CircleAvatar(
+                                radius: 27,
+                                child: (state.fetchProfilePictureModel.url !=
+                                            null &&
+                                        state.fetchProfilePictureModel.url !=
+                                            '')
+                                    ? CachedNetworkImage(
+                                        imageUrl: state
+                                                .fetchProfilePictureModel.url ??
+                                            '',
+                                        placeholder: (context, url) =>
+                                            Icon(Icons.wallpaper_outlined),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(
+                                              Icons.error,
+                                              color: Colors.red,
+                                            ),
+                                        fit: BoxFit.cover)
+                                    : Image.asset(
+                                        'lib/assets/images/model.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                              ),
+                            );
+                          } else if (state is GetProfilePictureFailedState) {
+                            return ClipOval(
+                              child: CircleAvatar(
+                                radius: 27,
+                                child: Image.asset(
+                                    'lib/assets/images/model.png',
+                                    fit: BoxFit.cover),
+                              ),
+                            );
+                          } else if (state is GetProfilePictureProgressState) {
+                            return Container();
+                          } else {
+                            return ClipOval(
+                              child: CircleAvatar(
+                                radius: 27,
+                                child: Image.asset(
+                                    'lib/assets/images/model.png',
+                                    fit: BoxFit.cover),
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -100,6 +163,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           child: TextField(
+                            onChanged: (value) {
+                              _debounceTimer?.cancel();
+                              _debounceTimer = Timer(
+                                  const Duration(milliseconds: 1500), () async {
+                                _productsBloc?.add(
+                                    FetchAllProductsEvent(productName: value));
+                              });
+                            },
                             decoration: InputDecoration(
                               icon: AppImages.search(context),
                               contentPadding: EdgeInsets.symmetric(
@@ -141,11 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context, state) {
                       if (state is FetchAllProductSuccessState) {
                         stopLoader(context);
-                        return
-                            // Container(
-                            //   child: Text(json.encode(state.fetchProductModel)),
-                            // );
-                            StaggeredGridView.countBuilder(
+                        return StaggeredGridView.countBuilder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           staggeredTileBuilder: (index) {
@@ -158,16 +225,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemCount:
                               state.fetchProductModel.productList?.length,
                           itemBuilder: (BuildContext context, int index) {
-                            imageurl = state.fetchProductModel
-                                .productList?[index].images?[0];
-                            _productsBloc?.add(
-                                FetchImageEvent(fileName: imageurl ?? ''));
                             return GestureDetector(
                               onTap: () {
                                 Navigator.of(context)
                                     .pushNamed('/product-detail', arguments: {
-                                  "productModel": state
-                                      .fetchProductModel.productList?[index]
+                                  "productModel": state.fetchProductModel
+                                      .productList?[index].value
                                 });
                               },
                               child: Container(
@@ -176,139 +239,75 @@ class _HomeScreenState extends State<HomeScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    BlocBuilder<ProductsBloc, ProductState>(
-                                      buildWhen: (ProductState prevState,
-                                          ProductState currentState) {
-                                        return currentState
-                                                is FetchImageSuccessState ||
-                                            currentState
-                                                is FetchImageFailedState ||
-                                            currentState
-                                                is FetchImageProgressState;
-                                      },
-                                      builder: (context, state) {
-                                        if (state is FetchImageSuccessState) {
-                                          return Expanded(
-                                            child: Stack(
-                                              alignment: Alignment.topRight,
-                                              children: [
-                                                Positioned.fill(
-                                                  child: ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                      Radius.circular(14),
-                                                    ),
-                                                    child: Image.network(
-                                                        state.fetchImageModel
-                                                                .files?.url ??
-                                                            '',
-                                                        fit: BoxFit.cover),
-                                                  ),
-                                                ),
-                                                Positioned(
-                                                  right: 12,
-                                                  top: 12,
-                                                  child: GestureDetector(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        if (isItemAddedtoWishlist) {
-                                                          isItemAddedtoWishlist =
-                                                              false;
-                                                        } else {
-                                                          isItemAddedtoWishlist =
-                                                              true;
-                                                        }
-                                                      });
-                                                    },
-                                                    child: CircleAvatar(
-                                                        radius: 13,
-                                                        backgroundColor:
-                                                            Color(0xff292526),
-                                                        child: !isItemAddedtoWishlist
-                                                            ? AppImages
-                                                                .isNotFavourite(
-                                                                    context)
-                                                            : AppImages
-                                                                .isFavourite(
-                                                                    context)),
-                                                  ),
-                                                ),
-                                              ],
+                                    Expanded(
+                                      child: Stack(
+                                        alignment: Alignment.topRight,
+                                        children: [
+                                          Positioned.fill(
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(14),
+                                              ),
+                                              child: CachedNetworkImage(
+                                                  imageUrl: state
+                                                          .fetchProductModel
+                                                          .productList![index]
+                                                          .value
+                                                          ?.images?[0] ??
+                                                      '',
+                                                  placeholder: (context, url) =>
+                                                      Icon(Icons
+                                                          .wallpaper_outlined),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Icon(
+                                                            Icons.error,
+                                                            color: Colors.red,
+                                                          ),
+                                                  fit: BoxFit.cover),
                                             ),
-                                          );
-
-                                          // Container(
-                                          //   child: Text(json.encode(state.fetchProductModel)),
-                                          // );
-                                        } else if (state
-                                            is FetchImageFailedState) {
-                                          return Container(
-                                            child: Text(state.message),
-                                          );
-                                        } else if (state
-                                            is FetchImageProgressState) {
-                                          return CircularProgressIndicator();
-                                        } else {
-                                          return Container(
-                                            child: Text("hello"),
-                                          );
-                                        }
-                                      },
+                                          ),
+                                          Positioned(
+                                            right: 12,
+                                            top: 12,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  if (isItemAddedtoWishlist) {
+                                                    isItemAddedtoWishlist =
+                                                        false;
+                                                  } else {
+                                                    isItemAddedtoWishlist =
+                                                        true;
+                                                  }
+                                                });
+                                              },
+                                              child: CircleAvatar(
+                                                  radius: 13,
+                                                  backgroundColor:
+                                                      Color(0xff292526),
+                                                  child: !isItemAddedtoWishlist
+                                                      ? AppImages
+                                                          .isNotFavourite(
+                                                              context)
+                                                      : AppImages.isFavourite(
+                                                          context)),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-
-                                    // Expanded(
-                                    //   child: Stack(
-                                    //     alignment: Alignment.topRight,
-                                    //     children: [
-                                    //       Positioned.fill(
-                                    //         child: ClipRRect(
-                                    //           borderRadius: BorderRadius.all(
-                                    //             Radius.circular(14),
-                                    //           ),
-                                    //           child: Image.asset(
-                                    //               'lib/assets/images/model.png',
-                                    //               fit: BoxFit.cover),
-                                    //         ),
-                                    //       ),
-                                    //       Positioned(
-                                    //         right: 12,
-                                    //         top: 12,
-                                    //         child: GestureDetector(
-                                    //           onTap: () {
-                                    //             setState(() {
-                                    //               if (isItemAddedtoWishlist) {
-                                    //                 isItemAddedtoWishlist =
-                                    //                     false;
-                                    //               } else {
-                                    //                 isItemAddedtoWishlist =
-                                    //                     true;
-                                    //               }
-                                    //             });
-                                    //           },
-                                    //           child: CircleAvatar(
-                                    //               radius: 13,
-                                    //               backgroundColor:
-                                    //                   Color(0xff292526),
-                                    //               child: !isItemAddedtoWishlist
-                                    //                   ? AppImages
-                                    //                       .isNotFavourite(
-                                    //                           context)
-                                    //                   : AppImages.isFavourite(
-                                    //                       context)),
-                                    //         ),
-                                    //       ),
-                                    //     ],
-                                    //   ),
-                                    // ),
-
                                     Padding(
                                       padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
                                       child: Text(
                                         state
                                                 .fetchProductModel
                                                 .productList?[index]
-                                                .productName ??
+                                                .value
+                                                ?.productName ??
                                             "",
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
                                         style: GoogleFonts.encodeSans(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
@@ -321,8 +320,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                         state
                                                 .fetchProductModel
                                                 .productList?[index]
-                                                .productDesc ??
+                                                .value
+                                                ?.productDesc ??
                                             "",
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
                                         style: GoogleFonts.encodeSans(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w400,
@@ -334,12 +336,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          (state
-                                                      .fetchProductModel
-                                                      .productList?[index]
-                                                      .productPrice ??
-                                                  0)
+                                          ('₹ ${state.fetchProductModel.productList?[index].value?.productPrice ?? 0}')
                                               .toString(),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
                                           style: GoogleFonts.encodeSans(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
@@ -359,7 +359,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w400,
                                                   ).copyWith(
-                                                      color: Color(0xff1B2028)),
+                                                    color: Color(0xff1B2028),
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -388,129 +389,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                     },
                   ),
-
-                  // StaggeredGridView.countBuilder(
-                  //   shrinkWrap: true,
-                  //   physics: NeverScrollableScrollPhysics(),
-                  //   staggeredTileBuilder: (index) {
-                  //     return StaggeredTile.count(1, (index == 0) ? 1.9 : 2.1);
-                  //   },
-                  //   crossAxisCount: 2,
-                  //   mainAxisSpacing: 20.0,
-                  //   crossAxisSpacing: 20.0,
-                  //   itemCount: 6,
-                  //   itemBuilder: (BuildContext context, int index) {
-                  //     return itemCard();
-                  //   },
-                  // ),
                 ],
               ),
             ),
           ),
         ));
   }
-
-  // Widget itemCard({ProductList? productList}) {
-  //   return GestureDetector(
-  //     onTap: () {
-  //       Navigator.of(context).pushNamed('/product-detail');
-  //     },
-  //     child: Container(
-  //       color: Colors.white,
-  //       child: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         mainAxisAlignment: MainAxisAlignment.end,
-  //         children: [
-  //           Expanded(
-  //             child: Stack(
-  //               alignment: Alignment.topRight,
-  //               children: [
-  //                 Positioned.fill(
-  //                   child: ClipRRect(
-  //                     borderRadius: BorderRadius.all(
-  //                       Radius.circular(14),
-  //                     ),
-  //                     child: Image.asset('lib/assets/images/model.png',
-  //                         fit: BoxFit.cover),
-  //                   ),
-  //                 ),
-  //                 Positioned(
-  //                   right: 12,
-  //                   top: 12,
-  //                   child: GestureDetector(
-  //                     onTap: () {
-  //                       setState(() {
-  //                         if (isItemAddedtoWishlist) {
-  //                           isItemAddedtoWishlist = false;
-  //                         } else {
-  //                           isItemAddedtoWishlist = true;
-  //                         }
-  //                       });
-  //                     },
-  //                     child: CircleAvatar(
-  //                         radius: 13,
-  //                         backgroundColor: Color(0xff292526),
-  //                         child: !isItemAddedtoWishlist
-  //                             ? AppImages.isNotFavourite(context)
-  //                             : AppImages.isFavourite(context)),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //           Padding(
-  //             padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
-  //             child: Text(
-  //               productList?.productName ?? "",
-  //               style: GoogleFonts.encodeSans(
-  //                 fontSize: 16,
-  //                 fontWeight: FontWeight.w600,
-  //               ).copyWith(color: Color(0xff1B2028)),
-  //             ),
-  //           ),
-  //           Padding(
-  //             padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
-  //             child: Text(
-  //               productList?.productDesc ?? "",
-  //               style: GoogleFonts.encodeSans(
-  //                 fontSize: 12,
-  //                 fontWeight: FontWeight.w400,
-  //               ).copyWith(color: Color(0xffA4AAAD)),
-  //             ),
-  //           ),
-  //           Row(
-  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //             children: [
-  //               Text(
-  //                 (productList?.productPrice ?? 0).toString(),
-  //                 style: GoogleFonts.encodeSans(
-  //                   fontSize: 16,
-  //                   fontWeight: FontWeight.w600,
-  //                 ).copyWith(color: Color(0xff1B2028)),
-  //               ),
-  //               Padding(
-  //                 padding: EdgeInsets.only(right: 20.0),
-  //                 child: Row(
-  //                   children: [
-  //                     AppImages.rating(context),
-  //                     Padding(
-  //                       padding: EdgeInsets.fromLTRB(7, 0, 0, 0),
-  //                       child: Text(
-  //                         "5.0",
-  //                         style: GoogleFonts.encodeSans(
-  //                           fontSize: 12,
-  //                           fontWeight: FontWeight.w400,
-  //                         ).copyWith(color: Color(0xff1B2028)),
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ],
-  //           )
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }

@@ -3,7 +3,12 @@ abstract class ProductEvent {}
 //Does Mobile number exist Event
 
 class FetchAllProductsEvent extends ProductEvent {
-  FetchAllProductsEvent();
+  final String productName;
+  FetchAllProductsEvent({required this.productName});
+}
+
+class FetchUserProductsEvent extends ProductEvent {
+  FetchUserProductsEvent();
 }
 
 class FetchImageEvent extends ProductEvent {
@@ -14,6 +19,20 @@ class FetchImageEvent extends ProductEvent {
 class FetchMultipleImagesEvent extends ProductEvent {
   List<String> fileName;
   FetchMultipleImagesEvent({required this.fileName});
+}
+
+class PostProductEvent extends ProductEvent {
+  final String productName;
+  final String productCategory;
+  final String productPrice;
+  String? productDesc;
+  List<String>? images;
+  PostProductEvent(
+      {required this.productName,
+      required this.productCategory,
+      required this.productPrice,
+      this.productDesc,
+      this.images});
 }
 
 // User Product Event

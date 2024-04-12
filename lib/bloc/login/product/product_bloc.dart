@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:sys_mobile/bloc/login/product/product_event.dart';
 import 'package:sys_mobile/bloc/login/product/product_state.dart';
 
@@ -19,11 +21,17 @@ class ProductsBloc extends BaseBloc<ProductEvent, ProductState> {
     if (event is FetchAllProductsEvent) {
       yield* _handleFetchAllProductEvent(event);
     }
+    if (event is FetchUserProductsEvent) {
+      yield* _handleFetchUserProductsEvent(event);
+    }
     if (event is FetchImageEvent) {
       yield* _handleFetchImageEvent(event);
     }
     if (event is FetchMultipleImagesEvent) {
       yield* _handleFetchMultipleImagesEvent(event);
+    }
+    if (event is PostProductEvent) {
+      yield* _handlePostProductEvent(event);
     }
   }
 
@@ -31,7 +39,11 @@ class ProductsBloc extends BaseBloc<ProductEvent, ProductState> {
       FetchAllProductsEvent event) async* {
     yield FetchAllProductProgressState();
     try {
-      final Response response = await ProductRepository().fetchAllProducts();
+      Map<String, dynamic> body = {
+        "productName": event.productName,
+      };
+      final Response response =
+          await ProductRepository().fetchAllProducts(body);
       if (response.statusCode == 200 || response.statusCode == 201) {
         final fetchProductModel = FetchProductModel.fromJson(response.data);
         yield FetchAllProductSuccessState(fetchProductModel);
@@ -64,7 +76,8 @@ class ProductsBloc extends BaseBloc<ProductEvent, ProductState> {
       Map<String, dynamic> body = {
         'fileName': event.fileName,
       };
-      final Response response = await ProductRepository().fetchMultipleImages(body);
+      final Response response =
+          await ProductRepository().fetchMultipleImages(body);
       if (response.statusCode == 200 || response.statusCode == 201) {
         final fetchImageModel =
             FetchMultipleImagesModel.fromJson(response.data);
@@ -72,6 +85,56 @@ class ProductsBloc extends BaseBloc<ProductEvent, ProductState> {
       }
     } on Exception catch (ex) {
       yield FetchMultipleImagesFailedState(ex.toString());
+    }
+  }
+
+  Stream<ProductState> _handlePostProductEvent(PostProductEvent event) async* {
+    yield PostProductProgressState();
+    try {
+      List<dynamic> files = [];
+      if (event.images != null && event.images!.isNotEmpty) {
+        (event.images)?.forEach(
+          (e) => print(e),
+        );
+        (event.images)!.forEach((e) {
+          // files.add(File(e));
+          // var file =  MultipartFile.fromFileSync(File(e).path,
+          //     filename: (File(e).path.split('/').last));
+          files.add(
+            MultipartFile.fromFileSync(File(e).path,
+                filename: (File(e).path.split('/').last),
+                contentType: MediaType('image', '*')),
+          );
+        });
+      }
+      FormData body = FormData.fromMap({
+        "productName": event.productName,
+        "productCategory": event.productCategory,
+        "productDesc": event.productDesc,
+        "productPrice": event.productPrice,
+        "files": event.images != null ? files : null,
+      });
+      final Response response = await ProductRepository().postProduct(body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        String message = (response.data['message']);
+        yield PostProductSuccessState(message);
+      }
+    } on Exception catch (ex) {
+      yield PostProductFailedState(ex.toString());
+    }
+  }
+
+  Stream<ProductState> _handleFetchUserProductsEvent(
+      FetchUserProductsEvent event) async* {
+    yield FetchUserProductsProgressState();
+    try {
+      final Response response = await ProductRepository().getuserPost();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final fetchProductModel = FetchProductModel.fromJson(response.data);
+        yield FetchUserProductsSuccessState(fetchProductModel);
+      }
+    } on Exception catch (ex) {
+      yield FetchUserProductsFailedState(ex.toString());
     }
   }
 }
