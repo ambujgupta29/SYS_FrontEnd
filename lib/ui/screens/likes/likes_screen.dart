@@ -1,13 +1,15 @@
 import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:focus_detector_v2/focus_detector_v2.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+
 import 'package:sys_mobile/bloc/login/product/product_bloc.dart';
 import 'package:sys_mobile/bloc/login/product/product_event.dart';
+
 import 'package:sys_mobile/bloc/login/product/product_state.dart';
 import 'package:sys_mobile/bloc/profile/profile_bloc.dart';
 import 'package:sys_mobile/bloc/profile/profile_event.dart';
@@ -15,39 +17,44 @@ import 'package:sys_mobile/bloc/profile/profile_state.dart';
 
 import 'package:sys_mobile/common/loader_control.dart';
 import 'package:sys_mobile/ui/utils/app_images.dart';
-import 'package:sys_mobile/ui/utils/store/app_storage.dart';
-import 'package:sys_mobile/ui/utils/store/storage_constants.dart';
 
-class HomeScreen extends StatefulWidget {
+class LikesScreen extends StatefulWidget {
   final dynamic arguments;
-  const HomeScreen({super.key, this.arguments});
+  const LikesScreen({super.key, this.arguments});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<LikesScreen> createState() => _LikesScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _LikesScreenState extends State<LikesScreen> {
   ProductsBloc? _productsBloc;
   ProfileBloc? _profileBloc;
-  Map<String, dynamic>? decodedToken;
-  String? imageurl;
-  Timer? _debounceTimer;
   StreamSubscription<ProfileState>? _subscription;
   List<String>? favlist;
+
+  String? imageurl;
   @override
   void initState() {
     _productsBloc = BlocProvider.of(context);
     _profileBloc = BlocProvider.of(context);
-    _subscription = _profileBloc?.stream.listen(favListener);
-    _productsBloc?.add(FetchAllProductsEvent(productName: ''));
-    _profileBloc?.add(GetProfilePictureEvent());
+    _profileBloc?.add(GetUserInfoEvent());
     _profileBloc?.add(GetFavListEvent());
-    decodedToken = JwtDecoder.decode(AppStorage().getString(USER_TOKEN));
-    print(decodedToken);
+    _subscription = _profileBloc?.stream.listen(userInfoListener);
+
     super.initState();
   }
 
-  Future<void> favListener(state) async {
+  Future<void> userInfoListener(state) async {
+    if (state is GetUserInfoSuccessState) {
+      stopLoader(context);
+      _productsBloc?.add(FetchProductByIDEvent(
+          productIdList: state.fetchUserInfoModel.favourites ?? []));
+    } else if (state is GetUserInfoFailedState) {
+      stopLoader(context);
+      print(state.message);
+    } else if (state is GetUserInfoProgressState) {
+      startLoader(context);
+    }
     if (state is AddItemToFavSuccessState) {
       stopLoader(context);
       _profileBloc?.add(GetFavListEvent());
@@ -73,6 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
           print('xxxx${favlist}');
         });
       }
+      _profileBloc?.add(GetUserInfoEvent());
     } else if (state is GetFavListFailedState) {
       stopLoader(context);
       print(state.message);
@@ -83,7 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
     _subscription?.cancel();
     super.dispose();
   }
@@ -93,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return FocusDetector(
       onFocusGained: () {
-        _profileBloc?.add(GetFavListEvent());
+        _profileBloc?.add(GetUserInfoEvent());
       },
       child: Scaffold(
           backgroundColor: Colors.white,
@@ -111,17 +118,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Hello,Welcome 👋",
-                              style: GoogleFonts.encodeSans(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                              ).copyWith(color: Color(0xff1B2028)),
-                            ),
+                            // Text(
+                            //   "Hello,Welcome 👋",
+                            //   style: GoogleFonts.encodeSans(
+                            //     fontSize: 16,
+                            //     fontWeight: FontWeight.w400,
+                            //   ).copyWith(color: Color(0xff1B2028)),
+                            // ),
                             Padding(
                               padding: EdgeInsets.only(top: 2.0),
                               child: Text(
-                                decodedToken?['fullname'] ?? 'NA',
+                                'Favourites',
                                 style: GoogleFonts.encodeSans(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -130,132 +137,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                        BlocBuilder<ProfileBloc, ProfileState>(
-                          buildWhen: (ProfileState prevState,
-                              ProfileState currentState) {
-                            return currentState
-                                    is GetProfilePictureSuccessState ||
-                                currentState is GetProfilePictureFailedState ||
-                                currentState is GetProfilePictureProgressState;
-                          },
-                          builder: (context, state) {
-                            if (state is GetProfilePictureSuccessState) {
-                              return ClipOval(
-                                child: CircleAvatar(
-                                  backgroundColor: Color(0xff1B2028),
-                                  radius: 27,
-                                  child: (state.fetchProfilePictureModel.url !=
-                                              null &&
-                                          state.fetchProfilePictureModel.url !=
-                                              '')
-                                      ? CachedNetworkImage(
-                                          imageUrl: state
-                                                  .fetchProfilePictureModel
-                                                  .url ??
-                                              '',
-                                          placeholder: (context, url) =>
-                                              Icon(Icons.wallpaper_outlined),
-                                          errorWidget: (context, url, error) =>
-                                              Icon(
-                                                Icons.error,
-                                                color: Colors.red,
-                                              ),
-                                          fit: BoxFit.cover)
-                                      : Icon(
-                                          Icons.person,
-                                          color: Colors.white,
-                                          size: 30,
-                                        ),
-                                  // Image.asset(
-                                  //     'lib/assets/images/model.png',
-                                  //     fit: BoxFit.cover,
-                                  //   ),
-                                ),
-                              );
-                            } else if (state is GetProfilePictureFailedState) {
-                              return ClipOval(
-                                child: CircleAvatar(
-                                    radius: 27,
-                                    backgroundColor: Color(0xff1B2028),
-                                    child: Icon(
-                                      Icons.person,
-                                      color: Colors.white,
-                                      size: 30,
-                                    )),
-                              );
-                            } else if (state
-                                is GetProfilePictureProgressState) {
-                              return Container();
-                            } else {
-                              return ClipOval(
-                                child: CircleAvatar(
-                                    radius: 27,
-                                    backgroundColor: Color(0xff1B2028),
-                                    child: Icon(
-                                      Icons.person,
-                                      color: Colors.white,
-                                      size: 30,
-                                    )),
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Flexible(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                  10.0), // Adjust the border radius as needed
-                              border: Border.all(
-                                color: Color(0XFFEDEDED),
-                                width: 1.0,
-                              ),
-                            ),
-                            child: TextField(
-                              onChanged: (value) {
-                                _debounceTimer?.cancel();
-                                _debounceTimer =
-                                    Timer(const Duration(milliseconds: 1500),
-                                        () async {
-                                  _productsBloc?.add(FetchAllProductsEvent(
-                                      productName: value));
-                                });
-                              },
-                              decoration: InputDecoration(
-                                icon: AppImages.search(context),
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 15.0,
-                                ),
-                                hintText: 'Search',
-                                hintStyle: GoogleFonts.encodeSans(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ).copyWith(color: Color(0xff878787)),
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Container(
-                            decoration: const BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                              color: Color(0XFF292526),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 12),
-                            child: AppImages.filter(context, height: 25)),
                       ],
                     ),
                     const SizedBox(
@@ -264,12 +145,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     BlocBuilder<ProductsBloc, ProductState>(
                       buildWhen:
                           (ProductState prevState, ProductState currentState) {
-                        return currentState is FetchAllProductSuccessState ||
-                            currentState is FetchAllProductFailedState ||
-                            currentState is FetchAllProductProgressState;
+                        return currentState is FetchProductByIDSuccessState ||
+                            currentState is FetchProductByIDFailedState ||
+                            currentState is FetchProductByIDProgressState;
                       },
                       builder: (context, state) {
-                        if (state is FetchAllProductSuccessState) {
+                        if (state is FetchProductByIDSuccessState) {
                           stopLoader(context);
                           return StaggeredGridView.countBuilder(
                             shrinkWrap: true,
@@ -464,12 +345,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               );
                             },
                           );
-                        } else if (state is FetchAllProductFailedState) {
+                        } else if (state is FetchProductByIDFailedState) {
                           stopLoader(context);
                           return Container(
                             child: Text(state.message),
                           );
-                        } else if (state is FetchAllProductProgressState) {
+                        } else if (state is FetchProductByIDProgressState) {
                           startLoader(context);
                           return Container();
                         } else {

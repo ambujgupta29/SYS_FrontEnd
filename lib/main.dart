@@ -56,22 +56,12 @@ void main() async {
           });
         } else if (settings.name == '/bottom-nav') {
           return CupertinoPageRoute(builder: (context) {
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider<ProductsBloc>(
-                  create: (BuildContext context) => ProductsBloc(),
-                ),
-                BlocProvider<ProfileBloc>(
-                  create: (BuildContext context) => ProfileBloc(),
-                ),
-              ],
-              child: BottomNavBarScreen(arguments: settings.arguments),
-            );
+            return BottomNavBarScreen(arguments: settings.arguments);
           });
         } else if (settings.name == '/product-detail') {
           return CupertinoPageRoute(builder: (context) {
             return BlocProvider(
-              create: (context) => ProductsBloc(),
+              create: (context) => ProfileBloc(),
               child: ProductDetailScreen(arguments: settings.arguments),
             );
           });

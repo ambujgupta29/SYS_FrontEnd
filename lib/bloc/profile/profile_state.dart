@@ -1,5 +1,6 @@
 import 'package:sys_mobile/common/screen_state.dart';
 import 'package:sys_mobile/models/products/fetch_profile_picture_model.dart';
+import 'package:sys_mobile/models/products/user_info_model.dart';
 
 abstract class ProfileState extends ScreenState {}
 
@@ -31,4 +32,52 @@ class UploadProfilePictureFailedState extends ProfileState {
 class UploadProfilePictureSuccessState extends ProfileState {
   String message;
   UploadProfilePictureSuccessState(this.message);
+}
+
+class GetUserInfoProgressState extends ProfileState {}
+
+class GetUserInfoFailedState extends ProfileState {
+  String message;
+  GetUserInfoFailedState(this.message);
+}
+
+class GetUserInfoSuccessState extends ProfileState {
+  FetchUserInfoModel fetchUserInfoModel;
+  GetUserInfoSuccessState(this.fetchUserInfoModel);
+}
+
+class AddItemToFavProgressState extends ProfileState {}
+
+class AddItemToFavFailedState extends ProfileState {
+  String message;
+  AddItemToFavFailedState(this.message);
+}
+
+class AddItemToFavSuccessState extends ProfileState {
+  FetchUserInfoModel fetchUserInfoModel;
+  AddItemToFavSuccessState(this.fetchUserInfoModel);
+}
+
+class RemoveItemFromFavProgressState extends ProfileState {}
+
+class RemoveItemFromFavFailedState extends ProfileState {
+  String message;
+  RemoveItemFromFavFailedState(this.message);
+}
+
+class RemoveItemFromFavSuccessState extends ProfileState {
+  FetchUserInfoModel fetchUserInfoModel;
+  RemoveItemFromFavSuccessState(this.fetchUserInfoModel);
+}
+
+class GetFavListProgressState extends ProfileState {}
+
+class GetFavListFailedState extends ProfileState {
+  String message;
+  GetFavListFailedState(this.message);
+}
+
+class GetFavListSuccessState extends ProfileState {
+  FetchUserInfoModel fetchFavListModel;
+  GetFavListSuccessState(this.fetchFavListModel);
 }

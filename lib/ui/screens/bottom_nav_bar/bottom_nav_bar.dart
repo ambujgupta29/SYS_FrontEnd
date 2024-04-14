@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:sys_mobile/bloc/login/product/product_bloc.dart';
+import 'package:sys_mobile/bloc/profile/profile_bloc.dart';
 import 'package:sys_mobile/ui/screens/addPost/addPost_screen.dart';
 import 'package:sys_mobile/ui/screens/home/home_screen.dart';
+import 'package:sys_mobile/ui/screens/likes/likes_screen.dart';
 import 'package:sys_mobile/ui/screens/profile/profile_screen.dart';
 import 'package:sys_mobile/ui/utils/app_images.dart';
 
@@ -18,11 +22,51 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
 
   // Define the widgets for each tab
   final List<Widget> _tabs = [
-    HomeScreen(),
-    Text('likes Page'),
-    AddPostScreen(),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<ProductsBloc>(
+          create: (BuildContext context) => ProductsBloc(),
+        ),
+        BlocProvider<ProfileBloc>(
+          create: (BuildContext context) => ProfileBloc(),
+        ),
+      ],
+      child: HomeScreen(),
+    ),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<ProductsBloc>(
+          create: (BuildContext context) => ProductsBloc(),
+        ),
+        BlocProvider<ProfileBloc>(
+          create: (BuildContext context) => ProfileBloc(),
+        ),
+      ],
+      child: LikesScreen(),
+    ),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<ProductsBloc>(
+          create: (BuildContext context) => ProductsBloc(),
+        ),
+        BlocProvider<ProfileBloc>(
+          create: (BuildContext context) => ProfileBloc(),
+        ),
+      ],
+      child: AddPostScreen(),
+    ),
     Text('cart Page'),
-    ProfileScreen()
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<ProductsBloc>(
+          create: (BuildContext context) => ProductsBloc(),
+        ),
+        BlocProvider<ProfileBloc>(
+          create: (BuildContext context) => ProfileBloc(),
+        ),
+      ],
+      child: ProfileScreen(),
+    ),
   ];
 
   // Function to handle tab selection

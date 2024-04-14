@@ -28,11 +28,46 @@ class ProfileRepository {
     return response;
   }
 
+  Future<Response> getUserInfo() async {
+    final token = await AppStorage().getString(USER_TOKEN);
+    var response = await apiBaseHelper.get(
+        url: ApiServiceUrl.fetchUserInfo,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }));
+    return response;
+  }
+
   Future<Response> uploadProfilePic(FormData body) async {
     final token = await AppStorage().getString(USER_TOKEN);
     var response = await apiBaseHelper.patchFormData(
         body: body,
         url: ApiServiceUrl.uploadProfilePic,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }));
+    return response;
+  }
+
+  Future<Response> addToFav(Map<String, dynamic> body) async {
+    final token = await AppStorage().getString(USER_TOKEN);
+    var response = await apiBaseHelper.patch(
+        url: ApiServiceUrl.addToFav,
+        body: body,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }));
+    return response;
+  }
+
+  Future<Response> removeFromFav(Map<String, dynamic> body) async {
+    final token = await AppStorage().getString(USER_TOKEN);
+    var response = await apiBaseHelper.patch(
+        url: ApiServiceUrl.removeFromFav,
+        body: body,
         options: Options(headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",

@@ -35,6 +35,12 @@ class PostProductEvent extends ProductEvent {
       this.images});
 }
 
+
+class FetchProductByIDEvent extends ProductEvent {
+  final List<String> productIdList;
+  FetchProductByIDEvent({required this.productIdList});
+}
+
 // User Product Event
 
 

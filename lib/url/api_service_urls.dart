@@ -16,5 +16,9 @@ class ApiServiceUrl {
   static String getuserPost = '${ApiServiceUrl().domainName}/product/User';
   static String getProfilePic = '${ApiServiceUrl().domainName}/users/profilepic';
   static String uploadProfilePic = '${ApiServiceUrl().domainName}/users/profilepic';
-  
+  static String fetchProductById = '${ApiServiceUrl().domainName}/product/productId';
+  static String fetchUserInfo = '${ApiServiceUrl().domainName}/users/userinfo';
+
+  static String addToFav = '${ApiServiceUrl().domainName}/users/addItemToFav';
+  static String removeFromFav = '${ApiServiceUrl().domainName}/users/removeItemFromFav';
 }

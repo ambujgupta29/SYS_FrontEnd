@@ -1,6 +1,7 @@
 import 'package:sys_mobile/common/screen_state.dart';
 import 'package:sys_mobile/models/products/fetch_image_model.dart';
 import 'package:sys_mobile/models/products/fetch_multiple_images_model.dart';
+import 'package:sys_mobile/models/products/fetch_product_id_model.dart';
 import 'package:sys_mobile/models/products/fetch_product_model.dart';
 
 abstract class ProductState extends ScreenState {}
@@ -73,4 +74,17 @@ class PostProductFailedState extends ProductState {
 class PostProductSuccessState extends ProductState {
   String message;
   PostProductSuccessState(this.message);
+}
+
+
+class FetchProductByIDProgressState extends ProductState {}
+
+class FetchProductByIDFailedState extends ProductState {
+  String message;
+  FetchProductByIDFailedState(this.message);
+}
+
+class FetchProductByIDSuccessState extends ProductState {
+  FetchProductByIdModel fetchProductModel;
+  FetchProductByIDSuccessState(this.fetchProductModel);
 }

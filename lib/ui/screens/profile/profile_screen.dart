@@ -57,8 +57,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Navigator.pushNamed(context, '/UserproductListing');
       }),
       ProfileCardModel(
-          Icons.logout_outlined, "Logout", false, Color(0xff1B2028), () {
-        print("abc");
+          Icons.logout_outlined, "Logout", false, Color(0xff1B2028), () async {
+        await AppStorage().delete(USER_TOKEN);
+        await AppStorage().putBool(IS_LOGGED_IN, false);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/login-phone',
+          (route) => false,
+        );
       }),
     ];
     super.initState();
@@ -67,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> uploadProfilePicListener(state) async {
     if (state is UploadProfilePictureSuccessState) {
       stopLoader(context);
-      await Future.delayed(Duration(seconds: 3), () {
+      await Future.delayed(Duration(seconds: 2), () {
         _profileBloc?.add(GetProfilePictureEvent());
       });
     } else if (state is UploadProfilePictureFailedState) {
@@ -116,9 +122,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: Container(
                                       width: 150,
                                       height: 150,
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                      ),
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white.withOpacity(0.8)),
                                       // radius: 75,
                                       child: (state.fetchProfilePictureModel
                                                       .url !=
@@ -140,9 +146,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         color: Colors.red,
                                                       ),
                                               fit: BoxFit.cover)
-                                          : Image.asset(
-                                              'lib/assets/images/model.png',
-                                              fit: BoxFit.cover,
+                                          : Icon(
+                                              Icons.person,
+                                              color: Color(0xff1B2028),
+                                              size: 100,
                                             ),
                                     ),
                                   ),
@@ -170,13 +177,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: Container(
                                       width: 170,
                                       height: 170,
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                      ),
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white.withOpacity(0.8)),
                                       // radius: 75,
-                                      child: Image.asset(
-                                        'lib/assets/images/model.png',
-                                        fit: BoxFit.cover,
+                                      child: Icon(
+                                        Icons.person,
+                                        color: Color(0xff1B2028),
+                                        size: 100,
                                       ),
                                     ),
                                   ),
@@ -202,13 +210,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: Container(
                                       width: 170,
                                       height: 170,
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                      ),
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white.withOpacity(0.8)),
                                       // radius: 75,
-                                      child: Image.asset(
-                                        'lib/assets/images/model.png',
-                                        fit: BoxFit.cover,
+                                      child: Icon(
+                                        Icons.person,
+                                        color: Color(0xff1B2028),
+                                        size: 100,
                                       ),
                                     ),
                                   ),
@@ -292,7 +301,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (croppedFile != null) {
         setState(() {
-          uploadFile = File(croppedFile.path!);
+          uploadFile = File(croppedFile.path);
         });
         _profileBloc?.add(UploadProfilePictureEvent(uploadFile));
       }

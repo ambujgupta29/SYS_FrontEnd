@@ -175,6 +175,7 @@ class Value {
   String? productDesc;
   String? createdAt;
   String? updatedAt;
+  bool isFavourite = false;
   int? iV;
 
   Value(

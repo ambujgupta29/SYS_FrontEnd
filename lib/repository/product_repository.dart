@@ -29,6 +29,18 @@ class ProductRepository {
     return response;
   }
 
+  Future<Response> fetchProductById(Map<String, dynamic> body) async {
+    final token = await AppStorage().getString(USER_TOKEN);
+    var response = await apiBaseHelper.post(
+        url: ApiServiceUrl.fetchProductById,
+        body: body,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }));
+    return response;
+  }
+
   Future<Response> fetchImage(Map<String, dynamic> body) async {
     final token = await AppStorage().getString(USER_TOKEN);
     var response = await apiBaseHelper.post(

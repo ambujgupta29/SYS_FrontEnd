@@ -7,6 +7,7 @@ import 'package:sys_mobile/bloc/login/product/product_state.dart';
 import 'package:sys_mobile/common/base_bloc.dart';
 import 'package:sys_mobile/models/products/fetch_image_model.dart';
 import 'package:sys_mobile/models/products/fetch_multiple_images_model.dart';
+import 'package:sys_mobile/models/products/fetch_product_id_model.dart';
 import 'package:sys_mobile/models/products/fetch_product_model.dart';
 import 'package:sys_mobile/repository/product_repository.dart';
 
@@ -20,6 +21,9 @@ class ProductsBloc extends BaseBloc<ProductEvent, ProductState> {
   Stream<ProductState> handleEvents(ProductEvent event) async* {
     if (event is FetchAllProductsEvent) {
       yield* _handleFetchAllProductEvent(event);
+    }
+    if (event is FetchProductByIDEvent) {
+      yield* _handleFetchProductByIDEvent(event);
     }
     if (event is FetchUserProductsEvent) {
       yield* _handleFetchUserProductsEvent(event);
@@ -135,6 +139,24 @@ class ProductsBloc extends BaseBloc<ProductEvent, ProductState> {
       }
     } on Exception catch (ex) {
       yield FetchUserProductsFailedState(ex.toString());
+    }
+  }
+
+  Stream<ProductState> _handleFetchProductByIDEvent(
+      FetchProductByIDEvent event) async* {
+    yield FetchProductByIDProgressState();
+    try {
+      Map<String, dynamic> body = {
+        "ProductIdList": event.productIdList,
+      };
+      final Response response =
+          await ProductRepository().fetchProductById(body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final fetchProductModel = FetchProductByIdModel.fromJson(response.data);
+        yield FetchProductByIDSuccessState(fetchProductModel);
+      }
+    } on Exception catch (ex) {
+      yield FetchProductByIDFailedState(ex.toString());
     }
   }
 }
