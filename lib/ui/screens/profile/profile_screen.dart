@@ -52,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _profileBloc?.add(GetProfilePictureEvent());
     _profileBloc?.stream.listen(uploadProfilePicListener);
     profileCardList = [
-      ProfileCardModel(Icons.shopping_cart_checkout_outlined, "My Postings",
+      ProfileCardModel(Icons.shopping_cart_checkout_outlined, "My Listings",
           true, Color(0xff1B2028), () {
         Navigator.pushNamed(context, '/UserproductListing');
       }),
@@ -73,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> uploadProfilePicListener(state) async {
     if (state is UploadProfilePictureSuccessState) {
       stopLoader(context);
-      await Future.delayed(Duration(seconds: 2), () {
+      await Future.delayed(Duration(seconds: 1), () {
         _profileBloc?.add(GetProfilePictureEvent());
       });
     } else if (state is UploadProfilePictureFailedState) {

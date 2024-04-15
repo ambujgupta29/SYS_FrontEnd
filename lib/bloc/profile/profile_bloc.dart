@@ -34,6 +34,12 @@ class ProfileBloc extends BaseBloc<ProfileEvent, ProfileState> {
     if (event is AddItemToFavEvent) {
       yield* _handleAddItemToFavEvent(event);
     }
+    if (event is RemoveItemFromCartEvent) {
+      yield* _handleRemoveItemFromCartEvent(event);
+    }
+    if (event is AddItemToCartEvent) {
+      yield* _handleAddItemToCartEvent(event);
+    }
   }
 
   Stream<ProfileState> _handleGetProfilePictureEvent(
@@ -136,6 +142,40 @@ class ProfileBloc extends BaseBloc<ProfileEvent, ProfileState> {
       }
     } on Exception catch (ex) {
       yield GetFavListFailedState(ex.toString());
+    }
+  }
+
+  Stream<ProfileState> _handleAddItemToCartEvent(
+      AddItemToCartEvent event) async* {
+    yield AddItemToCartProgressState();
+    try {
+      Map<String, dynamic> body = {
+        'ProductId': event.productId,
+      };
+      final Response response = await ProfileRepository().addToCart(body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final fetchUserInfoModel = FetchUserInfoModel.fromJson(response.data);
+        yield AddItemToCartSuccessState(fetchUserInfoModel);
+      }
+    } on Exception catch (ex) {
+      yield AddItemToCartFailedState(ex.toString());
+    }
+  }
+
+  Stream<ProfileState> _handleRemoveItemFromCartEvent(
+      RemoveItemFromCartEvent event) async* {
+    yield RemoveItemFromCartProgressState();
+    try {
+      Map<String, dynamic> body = {
+        'ProductId': event.productId,
+      };
+      final Response response = await ProfileRepository().removeFromCart(body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final fetchUserInfoModel = FetchUserInfoModel.fromJson(response.data);
+        yield RemoveItemFromCartSuccessState(fetchUserInfoModel);
+      }
+    } on Exception catch (ex) {
+      yield RemoveItemFromCartFailedState(ex.toString());
     }
   }
 }

@@ -21,4 +21,7 @@ class ApiServiceUrl {
 
   static String addToFav = '${ApiServiceUrl().domainName}/users/addItemToFav';
   static String removeFromFav = '${ApiServiceUrl().domainName}/users/removeItemFromFav';
+
+  static String addToCart = '${ApiServiceUrl().domainName}/users/addItemToCart';
+  static String removeFromCart = '${ApiServiceUrl().domainName}/users/removeItemFromCart';
 }

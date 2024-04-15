@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:readmore/readmore.dart';
-import 'package:sys_mobile/bloc/login/product/product_bloc.dart';
 import 'package:sys_mobile/bloc/profile/profile_bloc.dart';
 import 'package:sys_mobile/bloc/profile/profile_event.dart';
 import 'package:sys_mobile/bloc/profile/profile_state.dart';
@@ -27,7 +27,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   ProfileBloc? _profileBloc;
   StreamSubscription<ProfileState>? _subscription;
   List<String>? favlist;
+  List<String>? cartlist;
   List<String>? images;
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _subscription?.cancel();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -65,6 +73,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       if (mounted) {
         setState(() {
           favlist = state.fetchFavListModel.favourites;
+          cartlist = state.fetchFavListModel.cart;
           print('xxxx${favlist}');
         });
       }
@@ -72,6 +81,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       stopLoader(context);
       print(state.message);
     } else if (state is GetFavListProgressState) {
+      startLoader(context);
+    }
+    if (state is AddItemToCartSuccessState) {
+      stopLoader(context);
+      _profileBloc?.add(GetFavListEvent());
+      print(state.fetchUserInfoModel);
+    } else if (state is AddItemToCartFailedState) {
+      stopLoader(context);
+      print(state.message);
+    } else if (state is AddItemToCartProgressState) {
+      startLoader(context);
+    } else if (state is RemoveItemFromCartSuccessState) {
+      stopLoader(context);
+      _profileBloc?.add(GetFavListEvent());
+    } else if (state is RemoveItemFromCartFailedState) {
+      stopLoader(context);
+      print(state.message);
+    } else if (state is RemoveItemFromCartProgressState) {
       startLoader(context);
     }
   }
@@ -106,8 +133,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                         borderRadius: BorderRadius.all(
                                           Radius.circular(20),
                                         ),
-                                        child:
-                                            Image.network(e, fit: BoxFit.cover),
+                                        child: CachedNetworkImage(
+                                            imageUrl: e,
+                                            placeholder: (context, url) =>
+                                                Icon(Icons.wallpaper_outlined),
+                                            errorWidget:
+                                                (context, url, error) => Icon(
+                                                      Icons.error,
+                                                      color: Colors.red,
+                                                    ),
+                                            fit: BoxFit.cover),
                                       ),
                                     );
                                   }),
@@ -335,33 +370,48 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ],
                 ),
               ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 22),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(40)),
-                  color: Color(0xff292526),
-                ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: AppImages.cartUnselected(context),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 10.0),
-                        child: Text(
-                          "Add to Cart | ₹ ${widget.arguments['productModel'].productPrice}",
-                          style: GoogleFonts.encodeSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ).copyWith(color: Colors.white),
+              GestureDetector(
+                onTap: () {
+                  if ((cartlist ?? [])
+                      .contains(widget.arguments['productModel'].sId)) {
+                    _profileBloc?.add(RemoveItemFromCartEvent(
+                        productId: widget.arguments['productModel'].sId ?? ''));
+                  } else {
+                    _profileBloc?.add(AddItemToCartEvent(
+                        productId: widget.arguments['productModel'].sId ?? ''));
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 22),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(40)),
+                    color: Color(0xff292526),
+                  ),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: AppImages.cartUnselected(context),
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: EdgeInsets.only(left: 10.0),
+                          child: Text(
+                            ((cartlist ?? []).contains(
+                                    widget.arguments['productModel'].sId))
+                                ? "Remove from Cart | ₹ ${widget.arguments['productModel'].productPrice}"
+                                : "Add to Cart | ₹ ${widget.arguments['productModel'].productPrice}",
+                            style: GoogleFonts.encodeSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ).copyWith(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               )

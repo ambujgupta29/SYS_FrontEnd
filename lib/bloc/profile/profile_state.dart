@@ -81,3 +81,29 @@ class GetFavListSuccessState extends ProfileState {
   FetchUserInfoModel fetchFavListModel;
   GetFavListSuccessState(this.fetchFavListModel);
 }
+
+
+
+class AddItemToCartProgressState extends ProfileState {}
+
+class AddItemToCartFailedState extends ProfileState {
+  String message;
+  AddItemToCartFailedState(this.message);
+}
+
+class AddItemToCartSuccessState extends ProfileState {
+  FetchUserInfoModel fetchUserInfoModel;
+  AddItemToCartSuccessState(this.fetchUserInfoModel);
+}
+
+class RemoveItemFromCartProgressState extends ProfileState {}
+
+class RemoveItemFromCartFailedState extends ProfileState {
+  String message;
+  RemoveItemFromCartFailedState(this.message);
+}
+
+class RemoveItemFromCartSuccessState extends ProfileState {
+  FetchUserInfoModel fetchUserInfoModel;
+  RemoveItemFromCartSuccessState(this.fetchUserInfoModel);
+}

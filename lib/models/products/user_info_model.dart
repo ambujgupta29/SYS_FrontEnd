@@ -6,6 +6,7 @@ class FetchUserInfoModel {
   String? email;
   String? profilePicture;
   List<String>? favourites;
+  List<String>? cart;
   String? createdAt;
   String? updatedAt;
   int? iV;
@@ -18,6 +19,7 @@ class FetchUserInfoModel {
       this.email,
       this.profilePicture,
       this.favourites,
+      this.cart,
       this.createdAt,
       this.updatedAt,
       this.iV});
@@ -30,6 +32,7 @@ class FetchUserInfoModel {
     email = json['email'];
     profilePicture = json['profilePicture'];
     favourites = json['favourites'].cast<String>();
+    cart = json['cart'].cast<String>();
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     iV = json['__v'];
@@ -44,6 +47,7 @@ class FetchUserInfoModel {
     data['email'] = this.email;
     data['profilePicture'] = this.profilePicture;
     data['favourites'] = this.favourites;
+    data['cart'] = this.cart;
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;

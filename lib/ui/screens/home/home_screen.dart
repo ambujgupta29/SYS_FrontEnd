@@ -98,332 +98,301 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
           backgroundColor: Colors.white,
           body: SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding:
-                    const EdgeInsets.only(right: 15.0, left: 15.0, top: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Hello,Welcome 👋",
+            child: Padding(
+              padding: const EdgeInsets.only(right: 15.0, left: 15.0, top: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Hello,Welcome 👋",
+                            style: GoogleFonts.encodeSans(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ).copyWith(color: Color(0xff1B2028)),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.0),
+                            child: Text(
+                              decodedToken?['fullname'] ?? 'NA',
                               style: GoogleFonts.encodeSans(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
                               ).copyWith(color: Color(0xff1B2028)),
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 2.0),
-                              child: Text(
-                                decodedToken?['fullname'] ?? 'NA',
-                                style: GoogleFonts.encodeSans(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                ).copyWith(color: Color(0xff1B2028)),
+                          ),
+                        ],
+                      ),
+                      BlocBuilder<ProfileBloc, ProfileState>(
+                        buildWhen: (ProfileState prevState,
+                            ProfileState currentState) {
+                          return currentState
+                                  is GetProfilePictureSuccessState ||
+                              currentState is GetProfilePictureFailedState ||
+                              currentState is GetProfilePictureProgressState;
+                        },
+                        builder: (context, state) {
+                          if (state is GetProfilePictureSuccessState) {
+                            return ClipOval(
+                              child: CircleAvatar(
+                                backgroundColor: Color(0xFF292526),
+                                radius: 27,
+                                child: (state.fetchProfilePictureModel.url !=
+                                            null &&
+                                        state.fetchProfilePictureModel.url !=
+                                            '')
+                                    ? CachedNetworkImage(
+                                        imageUrl: state
+                                                .fetchProfilePictureModel.url ??
+                                            '',
+                                        placeholder: (context, url) =>
+                                            Icon(Icons.wallpaper_outlined),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(
+                                              Icons.error,
+                                              color: Colors.red,
+                                            ),
+                                        fit: BoxFit.cover)
+                                    : Icon(
+                                        Icons.person,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                // Image.asset(
+                                //     'lib/assets/images/model.png',
+                                //     fit: BoxFit.cover,
+                                //   ),
                               ),
-                            ),
-                          ],
-                        ),
-                        BlocBuilder<ProfileBloc, ProfileState>(
-                          buildWhen: (ProfileState prevState,
-                              ProfileState currentState) {
-                            return currentState
-                                    is GetProfilePictureSuccessState ||
-                                currentState is GetProfilePictureFailedState ||
-                                currentState is GetProfilePictureProgressState;
-                          },
-                          builder: (context, state) {
-                            if (state is GetProfilePictureSuccessState) {
-                              return ClipOval(
-                                child: CircleAvatar(
-                                  backgroundColor: Color(0xff1B2028),
+                            );
+                          } else if (state is GetProfilePictureFailedState) {
+                            return ClipOval(
+                              child: CircleAvatar(
                                   radius: 27,
-                                  child: (state.fetchProfilePictureModel.url !=
-                                              null &&
-                                          state.fetchProfilePictureModel.url !=
-                                              '')
-                                      ? CachedNetworkImage(
-                                          imageUrl: state
-                                                  .fetchProfilePictureModel
-                                                  .url ??
-                                              '',
-                                          placeholder: (context, url) =>
-                                              Icon(Icons.wallpaper_outlined),
-                                          errorWidget: (context, url, error) =>
-                                              Icon(
-                                                Icons.error,
-                                                color: Colors.red,
-                                              ),
-                                          fit: BoxFit.cover)
-                                      : Icon(
-                                          Icons.person,
-                                          color: Colors.white,
-                                          size: 30,
-                                        ),
-                                  // Image.asset(
-                                  //     'lib/assets/images/model.png',
-                                  //     fit: BoxFit.cover,
-                                  //   ),
-                                ),
-                              );
-                            } else if (state is GetProfilePictureFailedState) {
-                              return ClipOval(
-                                child: CircleAvatar(
-                                    radius: 27,
-                                    backgroundColor: Color(0xff1B2028),
-                                    child: Icon(
-                                      Icons.person,
-                                      color: Colors.white,
-                                      size: 30,
-                                    )),
-                              );
-                            } else if (state
-                                is GetProfilePictureProgressState) {
-                              return Container();
-                            } else {
-                              return ClipOval(
-                                child: CircleAvatar(
-                                    radius: 27,
-                                    backgroundColor: Color(0xff1B2028),
-                                    child: Icon(
-                                      Icons.person,
-                                      color: Colors.white,
-                                      size: 30,
-                                    )),
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Flexible(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                  10.0), // Adjust the border radius as needed
-                              border: Border.all(
-                                color: Color(0XFFEDEDED),
-                                width: 1.0,
-                              ),
+                                  backgroundColor: Color(0xFF292526),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: Colors.white,
+                                    size: 30,
+                                  )),
+                            );
+                          } else if (state is GetProfilePictureProgressState) {
+                            return Container();
+                          } else {
+                            return ClipOval(
+                              child: CircleAvatar(
+                                  radius: 27,
+                                  backgroundColor: Color(0xFF292526),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: Colors.white,
+                                    size: 30,
+                                  )),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                                10.0), // Adjust the border radius as needed
+                            border: Border.all(
+                              color: Color(0XFFEDEDED),
+                              width: 1.0,
                             ),
-                            child: TextField(
-                              onChanged: (value) {
-                                _debounceTimer?.cancel();
-                                _debounceTimer =
-                                    Timer(const Duration(milliseconds: 1500),
-                                        () async {
-                                  _productsBloc?.add(FetchAllProductsEvent(
-                                      productName: value));
-                                });
-                              },
-                              decoration: InputDecoration(
-                                icon: AppImages.search(context),
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 15.0,
-                                ),
-                                hintText: 'Search',
-                                hintStyle: GoogleFonts.encodeSans(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ).copyWith(color: Color(0xff878787)),
-                                border: InputBorder.none,
+                          ),
+                          child: TextField(
+                            onChanged: (value) {
+                              _debounceTimer?.cancel();
+                              _debounceTimer = Timer(
+                                  const Duration(milliseconds: 1500), () async {
+                                _productsBloc?.add(
+                                    FetchAllProductsEvent(productName: value));
+                              });
+                            },
+                            decoration: InputDecoration(
+                              icon: AppImages.search(context),
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 15.0,
                               ),
+                              hintText: 'Search',
+                              hintStyle: GoogleFonts.encodeSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                              ).copyWith(color: Color(0xff878787)),
+                              border: InputBorder.none,
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Container(
-                            decoration: const BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                              color: Color(0XFF292526),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 12),
-                            child: AppImages.filter(context, height: 25)),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    BlocBuilder<ProductsBloc, ProductState>(
-                      buildWhen:
-                          (ProductState prevState, ProductState currentState) {
-                        return currentState is FetchAllProductSuccessState ||
-                            currentState is FetchAllProductFailedState ||
-                            currentState is FetchAllProductProgressState;
-                      },
-                      builder: (context, state) {
-                        if (state is FetchAllProductSuccessState) {
-                          stopLoader(context);
-                          return StaggeredGridView.countBuilder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            staggeredTileBuilder: (index) {
-                              return StaggeredTile.count(
-                                  1, (index == 0) ? 1.9 : 2.1);
-                            },
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 20.0,
-                            crossAxisSpacing: 20.0,
-                            itemCount:
-                                state.fetchProductModel.productList?.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context)
-                                      .pushNamed('/product-detail', arguments: {
-                                    "productModel": state.fetchProductModel
-                                        .productList?[index].value
-                                  });
-                                },
-                                child: Container(
-                                  color: Colors.white,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Expanded(
-                                        child: Stack(
-                                          alignment: Alignment.topRight,
-                                          children: [
-                                            Positioned.fill(
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(14),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      Container(
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            color: Color(0XFF292526),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 12),
+                          child: AppImages.filter(context, height: 25)),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  BlocBuilder<ProductsBloc, ProductState>(
+                    buildWhen:
+                        (ProductState prevState, ProductState currentState) {
+                      return currentState is FetchAllProductSuccessState ||
+                          currentState is FetchAllProductFailedState ||
+                          currentState is FetchAllProductProgressState;
+                    },
+                    builder: (context, state) {
+                      if (state is FetchAllProductSuccessState) {
+                        stopLoader(context);
+                        return Flexible(
+                          child: SingleChildScrollView(
+                            child: StaggeredGridView.countBuilder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              staggeredTileBuilder: (index) {
+                                return StaggeredTile.count(
+                                    1, (index == 0) ? 1.9 : 2.1);
+                              },
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 20.0,
+                              crossAxisSpacing: 20.0,
+                              itemCount:
+                                  state.fetchProductModel.productList?.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).pushNamed(
+                                        '/product-detail',
+                                        arguments: {
+                                          "productModel": state
+                                              .fetchProductModel
+                                              .productList?[index]
+                                              .value
+                                        });
+                                  },
+                                  child: Container(
+                                    color: Colors.white,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Expanded(
+                                          child: Stack(
+                                            alignment: Alignment.topRight,
+                                            children: [
+                                              Positioned.fill(
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                    Radius.circular(14),
+                                                  ),
+                                                  child: CachedNetworkImage(
+                                                      imageUrl: state
+                                                              .fetchProductModel
+                                                              .productList![
+                                                                  index]
+                                                              .value
+                                                              ?.images?[0] ??
+                                                          '',
+                                                      placeholder: (context,
+                                                              url) =>
+                                                          Icon(Icons
+                                                              .wallpaper_outlined),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          Icon(
+                                                            Icons.error,
+                                                            color: Colors.red,
+                                                          ),
+                                                      fit: BoxFit.cover),
                                                 ),
-                                                child: CachedNetworkImage(
-                                                    imageUrl: state
+                                              ),
+                                              Positioned(
+                                                right: 12,
+                                                top: 12,
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    if ((favlist ?? [])
+                                                        .contains(state
                                                             .fetchProductModel
                                                             .productList![index]
                                                             .value
-                                                            ?.images?[0] ??
-                                                        '',
-                                                    placeholder: (context,
-                                                            url) =>
-                                                        Icon(Icons
-                                                            .wallpaper_outlined),
-                                                    errorWidget:
-                                                        (context, url, error) =>
-                                                            Icon(
-                                                              Icons.error,
-                                                              color: Colors.red,
-                                                            ),
-                                                    fit: BoxFit.cover),
+                                                            ?.sId)) {
+                                                      _profileBloc?.add(
+                                                          RemoveItemFromFavEvent(
+                                                              productId: state
+                                                                      .fetchProductModel
+                                                                      .productList![
+                                                                          index]
+                                                                      .value
+                                                                      ?.sId ??
+                                                                  ''));
+                                                    } else {
+                                                      _profileBloc?.add(
+                                                          AddItemToFavEvent(
+                                                              productId: state
+                                                                      .fetchProductModel
+                                                                      .productList![
+                                                                          index]
+                                                                      .value
+                                                                      ?.sId ??
+                                                                  ''));
+                                                    }
+                                                  },
+                                                  child: CircleAvatar(
+                                                      radius: 13,
+                                                      backgroundColor:
+                                                          Color(0xff292526),
+                                                      child: (!(favlist ?? [])
+                                                              .contains(state
+                                                                  .fetchProductModel
+                                                                  .productList![
+                                                                      index]
+                                                                  .value
+                                                                  ?.sId))
+                                                          ? AppImages
+                                                              .isNotFavourite(
+                                                                  context)
+                                                          : AppImages
+                                                              .isFavourite(
+                                                                  context)),
+                                                ),
                                               ),
-                                            ),
-                                            Positioned(
-                                              right: 12,
-                                              top: 12,
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  if ((favlist ?? []).contains(
-                                                      state
-                                                          .fetchProductModel
-                                                          .productList![index]
-                                                          .value
-                                                          ?.sId)) {
-                                                    _profileBloc?.add(
-                                                        RemoveItemFromFavEvent(
-                                                            productId: state
-                                                                    .fetchProductModel
-                                                                    .productList![
-                                                                        index]
-                                                                    .value
-                                                                    ?.sId ??
-                                                                ''));
-                                                  } else {
-                                                    _profileBloc?.add(
-                                                        AddItemToFavEvent(
-                                                            productId: state
-                                                                    .fetchProductModel
-                                                                    .productList![
-                                                                        index]
-                                                                    .value
-                                                                    ?.sId ??
-                                                                ''));
-                                                  }
-                                                },
-                                                child: CircleAvatar(
-                                                    radius: 13,
-                                                    backgroundColor:
-                                                        Color(0xff292526),
-                                                    child: (!(favlist ?? [])
-                                                            .contains(state
-                                                                .fetchProductModel
-                                                                .productList![
-                                                                    index]
-                                                                .value
-                                                                ?.sId))
-                                                        ? AppImages
-                                                            .isNotFavourite(
-                                                                context)
-                                                        : AppImages.isFavourite(
-                                                            context)),
-                                              ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.fromLTRB(0, 8, 0, 8),
-                                        child: Text(
-                                          state
-                                                  .fetchProductModel
-                                                  .productList?[index]
-                                                  .value
-                                                  ?.productName ??
-                                              "",
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                          style: GoogleFonts.encodeSans(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                          ).copyWith(color: Color(0xff1B2028)),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.fromLTRB(0, 0, 0, 8),
-                                        child: Text(
-                                          state
-                                                  .fetchProductModel
-                                                  .productList?[index]
-                                                  .value
-                                                  ?.productDesc ??
-                                              "",
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                          style: GoogleFonts.encodeSans(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                          ).copyWith(color: Color(0xffA4AAAD)),
-                                        ),
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            ('₹ ${state.fetchProductModel.productList?[index].value?.productPrice ?? 0}')
-                                                .toString(),
+                                        Padding(
+                                          padding:
+                                              EdgeInsets.fromLTRB(0, 8, 0, 8),
+                                          child: Text(
+                                            state
+                                                    .fetchProductModel
+                                                    .productList?[index]
+                                                    .value
+                                                    ?.productName ??
+                                                "",
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 2,
                                             style: GoogleFonts.encodeSans(
@@ -432,55 +401,119 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ).copyWith(
                                                 color: Color(0xff1B2028)),
                                           ),
-                                          Padding(
-                                            padding:
-                                                EdgeInsets.only(right: 20.0),
-                                            child: Row(
-                                              children: [
-                                                AppImages.rating(context),
-                                                Padding(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      7, 0, 0, 0),
-                                                  child: Text(
-                                                    "5.0",
-                                                    style:
-                                                        GoogleFonts.encodeSans(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                    ).copyWith(
-                                                      color: Color(0xff1B2028),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              EdgeInsets.fromLTRB(0, 0, 0, 8),
+                                          child: Text(
+                                            state
+                                                    .fetchProductModel
+                                                    .productList?[index]
+                                                    .value
+                                                    ?.productDesc ??
+                                                "",
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                            style: GoogleFonts.encodeSans(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400,
+                                            ).copyWith(
+                                                color: Color(0xffA4AAAD)),
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              ('₹ ${state.fetchProductModel.productList?[index].value?.productPrice ?? 0}')
+                                                  .toString(),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              style: GoogleFonts.encodeSans(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ).copyWith(
+                                                  color: Color(0xff1B2028)),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 20.0),
+                                              child: Row(
+                                                children: [
+                                                  AppImages.rating(context),
+                                                  Padding(
+                                                    padding:
+                                                        EdgeInsets.fromLTRB(
+                                                            7, 0, 0, 0),
+                                                    child: Text(
+                                                      "5.0",
+                                                      style: GoogleFonts
+                                                          .encodeSans(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ).copyWith(
+                                                        color:
+                                                            Color(0xff1B2028),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      )
-                                    ],
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      } else if (state is FetchAllProductFailedState) {
+                        stopLoader(context);
+                        return Expanded(
+                          child: Center(
+                            child: Container(
+                              child: Text(
+                                textAlign: TextAlign.center,
+                                state.message,
+                                style: GoogleFonts.encodeSans(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ).copyWith(
+                                  color: Color(0xff1B2028),
                                 ),
-                              );
-                            },
-                          );
-                        } else if (state is FetchAllProductFailedState) {
-                          stopLoader(context);
-                          return Container(
-                            child: Text(state.message),
-                          );
-                        } else if (state is FetchAllProductProgressState) {
-                          startLoader(context);
-                          return Container();
-                        } else {
-                          return Container(
-                            child: Text("hello"),
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      } else if (state is FetchAllProductProgressState) {
+                        startLoader(context);
+                        return Container();
+                      } else {
+                        return Expanded(
+                          child: Center(
+                            child: Container(
+                              child: Text(
+                                textAlign: TextAlign.center,
+                                "No items found",
+                                style: GoogleFonts.encodeSans(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ).copyWith(
+                                  color: Color(0xff1B2028),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
           )),

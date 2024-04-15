@@ -4,6 +4,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:sys_mobile/bloc/login/product/product_bloc.dart';
 import 'package:sys_mobile/bloc/profile/profile_bloc.dart';
 import 'package:sys_mobile/ui/screens/addPost/addPost_screen.dart';
+import 'package:sys_mobile/ui/screens/cart/cart_screen.dart';
 import 'package:sys_mobile/ui/screens/home/home_screen.dart';
 import 'package:sys_mobile/ui/screens/likes/likes_screen.dart';
 import 'package:sys_mobile/ui/screens/profile/profile_screen.dart';
@@ -55,7 +56,17 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
       ],
       child: AddPostScreen(),
     ),
-    Text('cart Page'),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<ProductsBloc>(
+          create: (BuildContext context) => ProductsBloc(),
+        ),
+        BlocProvider<ProfileBloc>(
+          create: (BuildContext context) => ProfileBloc(),
+        ),
+      ],
+      child: Cartscreen(),
+    ),
     MultiBlocProvider(
       providers: [
         BlocProvider<ProductsBloc>(

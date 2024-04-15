@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -68,9 +69,9 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
                 ],
               ),
             ),
+           
             Flexible(
-              child:
-               BlocBuilder<ProductsBloc, ProductState>(
+              child: BlocBuilder<ProductsBloc, ProductState>(
                 buildWhen: (ProductState prevState, ProductState currentState) {
                   return currentState is FetchUserProductsSuccessState ||
                       currentState is FetchUserProductsFailedState ||
@@ -107,21 +108,38 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
                     );
                   } else if (state is FetchUserProductsFailedState) {
                     stopLoader(context);
-                    return Container(
-                      child: Text(state.message),
+                    return Center(
+                      child: Container(
+                        child: Text(
+                          state.message,
+                          style: GoogleFonts.encodeSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ).copyWith(
+                            color: Color(0xff1B2028),
+                          ),
+                        ),
+                      ),
                     );
                   } else if (state is FetchUserProductsProgressState) {
                     startLoader(context);
                     return Container();
                   } else {
                     return Container(
-                      child: Text("hello"),
+                      child: Text(
+                        "No items found",
+                        style: GoogleFonts.encodeSans(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ).copyWith(
+                          color: Color(0xff1B2028),
+                        ),
+                      ),
                     );
                   }
                 },
               ),
-           
-           ),
+            ),
           ],
         ),
       ),
@@ -143,10 +161,14 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
             child: Container(
               height: 100,
               width: 100,
-              child: Image.network(
-                productImage ?? '',
-                fit: BoxFit.cover,
-              ),
+              child: CachedNetworkImage(
+                  imageUrl: productImage ?? '',
+                  placeholder: (context, url) => Icon(Icons.wallpaper_outlined),
+                  errorWidget: (context, url, error) => Icon(
+                        Icons.error,
+                        color: Colors.red,
+                      ),
+                  fit: BoxFit.cover),
             ),
           ),
           SizedBox(
@@ -203,4 +225,5 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
       ),
     );
   }
+
 }

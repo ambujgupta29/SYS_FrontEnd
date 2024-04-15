@@ -28,3 +28,14 @@ class AddItemToFavEvent extends ProfileEvent {
 class GetFavListEvent extends ProfileEvent {
   GetFavListEvent();
 }
+
+
+class RemoveItemFromCartEvent extends ProfileEvent {
+  final String productId;
+  RemoveItemFromCartEvent({required this.productId});
+}
+
+class AddItemToCartEvent extends ProfileEvent {
+  final String productId;
+  AddItemToCartEvent({required this.productId});
+}

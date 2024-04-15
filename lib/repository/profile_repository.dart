@@ -74,4 +74,29 @@ class ProfileRepository {
         }));
     return response;
   }
+
+
+  Future<Response> addToCart(Map<String, dynamic> body) async {
+    final token = await AppStorage().getString(USER_TOKEN);
+    var response = await apiBaseHelper.patch(
+        url: ApiServiceUrl.addToCart,
+        body: body,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }));
+    return response;
+  }
+
+  Future<Response> removeFromCart(Map<String, dynamic> body) async {
+    final token = await AppStorage().getString(USER_TOKEN);
+    var response = await apiBaseHelper.patch(
+        url: ApiServiceUrl.removeFromCart,
+        body: body,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }));
+    return response;
+  }
 }
