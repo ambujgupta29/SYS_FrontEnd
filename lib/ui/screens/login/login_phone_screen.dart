@@ -125,11 +125,11 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
                   print('Invalid Mobile Number');
                 }
               },
-              // text: 'Login',
-              icon: Icon(
-                Icons.chevron_right,
-                color: SysAppTheme().buttonTextColor,
-              ),
+              text: 'Continue',
+              // icon: Icon(
+              //   Icons.chevron_right,
+              //   color: SysAppTheme().buttonTextColor,
+              // ),
             ),
           ],
         ),

@@ -86,4 +86,15 @@ class ProductRepository {
         }));
     return response;
   }
+
+  Future<Response> getMaxprice() async {
+    final token = await AppStorage().getString(USER_TOKEN);
+    var response = await apiBaseHelper.get(
+        url: ApiServiceUrl.getMaxPrice,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }));
+    return response;
+  }
 }

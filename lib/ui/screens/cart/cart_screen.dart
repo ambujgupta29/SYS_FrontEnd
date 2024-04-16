@@ -17,6 +17,7 @@ import 'package:sys_mobile/bloc/profile/profile_state.dart';
 import 'package:sys_mobile/common/loader_control.dart';
 import 'package:sys_mobile/models/products/fetch_product_id_model.dart';
 import 'package:sys_mobile/ui/utils/app_images.dart';
+import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 class Cartscreen extends StatefulWidget {
   const Cartscreen({super.key});
@@ -59,22 +60,22 @@ class _CartscreenState extends State<Cartscreen> {
     } else if (state is GetUserInfoProgressState) {
       startLoader(context);
     }
-    if (state is AddItemToFavSuccessState) {
+    if (state is AddItemToCartSuccessState) {
       stopLoader(context);
       _profileBloc?.add(GetFavListEvent());
       print(state.fetchUserInfoModel);
-    } else if (state is AddItemToFavFailedState) {
+    } else if (state is AddItemToCartFailedState) {
       stopLoader(context);
       print(state.message);
-    } else if (state is AddItemToFavProgressState) {
+    } else if (state is AddItemToCartProgressState) {
       startLoader(context);
-    } else if (state is RemoveItemFromFavSuccessState) {
+    } else if (state is RemoveItemFromCartSuccessState) {
       stopLoader(context);
       _profileBloc?.add(GetFavListEvent());
-    } else if (state is RemoveItemFromFavFailedState) {
+    } else if (state is RemoveItemFromCartFailedState) {
       stopLoader(context);
       print(state.message);
-    } else if (state is RemoveItemFromFavProgressState) {
+    } else if (state is RemoveItemFromCartProgressState) {
       startLoader(context);
     } else if (state is GetFavListSuccessState) {
       stopLoader(context);
@@ -107,18 +108,7 @@ class _CartscreenState extends State<Cartscreen> {
               padding: EdgeInsets.symmetric(vertical: 20.0),
               child: Row(
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: CircleAvatar(
-                          radius: 22,
-                          backgroundColor: Colors.white,
-                          child: AppImages.back(context, height: 45)),
-                    ),
-                  ),
+                  Expanded(flex: 1, child: Container()),
                   Expanded(
                     flex: 3,
                     child: Center(
@@ -227,105 +217,127 @@ class _CartscreenState extends State<Cartscreen> {
         children: [
           Container(
             margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-            padding: EdgeInsets.only(top: 10),
+            // padding: EdgeInsets.only(top: 10),
             decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10),
-                ),
-                border: Border.all(color: Colors.grey)),
+              color: Color(0xff1B2028),
+              borderRadius: BorderRadius.all(
+                Radius.circular(10),
+              ),
+              border: Border.all(color: Colors.grey),
+            ),
             child: Column(
               children: [
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: EdgeInsets.only(
-                          left: 15.0, right: 15.0, top: 15, bottom: 15),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.all(Radius.circular(14)),
-                            child: Container(
-                              height: 80,
-                              width: 80,
-                              child: CachedNetworkImage(
-                                  imageUrl: valuelist?[index].images?[0] ?? '',
-                                  placeholder: (context, url) =>
-                                      Icon(Icons.wallpaper_outlined),
-                                  errorWidget: (context, url, error) => Icon(
-                                        Icons.error,
-                                        color: Colors.red,
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                  ),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.only(top: 10),
+                    itemBuilder: (BuildContext context, int index) {
+                      return Padding(
+                        padding: EdgeInsets.only(
+                            left: 15.0, right: 15.0, top: 15, bottom: 15),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(14)),
+                              child: Container(
+                                height: 80,
+                                width: 80,
+                                child: CachedNetworkImage(
+                                    imageUrl:
+                                        valuelist?[index].images?[0] ?? '',
+                                    placeholder: (context, url) =>
+                                        Icon(Icons.wallpaper_outlined),
+                                    errorWidget: (context, url, error) => Icon(
+                                          Icons.error,
+                                          color: Colors.red,
+                                        ),
+                                    fit: BoxFit.cover),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 15,
+                            ),
+                            Expanded(
+                              child: Column(
+                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        (valuelist?[index].productName)
+                                            .toString(),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        style: GoogleFonts.encodeSans(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ).copyWith(color: Color(0xff1B2028)),
                                       ),
-                                  fit: BoxFit.cover),
+                                      Text(
+                                        (valuelist?[index].productCategory)
+                                            .toString(),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        style: GoogleFonts.encodeSans(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                        ).copyWith(color: Color(0xff1B2028)),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 15,
+                                  ),
+                                  Text(
+                                    ("₹ ${valuelist?[index].productPrice}")
+                                        .toString(),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    style: GoogleFonts.encodeSans(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ).copyWith(color: Color(0xff1B2028)),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 15,
-                          ),
-                          Expanded(
-                            child: Column(
-                              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      (valuelist?[index].productName)
-                                          .toString(),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                      style: GoogleFonts.encodeSans(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ).copyWith(color: Color(0xff1B2028)),
-                                    ),
-                                    Text(
-                                      (valuelist?[index].productCategory)
-                                          .toString(),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                      style: GoogleFonts.encodeSans(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                      ).copyWith(color: Color(0xff1B2028)),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 15,
-                                ),
-                                Text(
-                                  ("₹ ${valuelist?[index].productPrice}")
-                                      .toString(),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: GoogleFonts.encodeSans(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ).copyWith(color: Color(0xff1B2028)),
-                                ),
-                              ],
+                            SizedBox(
+                              width: 15,
                             ),
-                          ),
-                          SizedBox(
-                            width: 15,
-                          ),
-                          Icon(Icons.more_horiz_sharp)
-                        ],
-                      ),
-                    );
-                  },
-                  itemCount: valuelist?.length ?? 0,
-                  separatorBuilder: (BuildContext context, int index) {
-                    return Divider(
-                      indent: 15,
-                      endIndent: 15,
-                    );
-                  },
+                            GestureDetector(
+                              onTap: () {
+                                _profileBloc?.add(RemoveItemFromCartEvent(
+                                    productId: valuelist?[index].sId ?? ''));
+                              },
+                              child: Icon(
+                                Icons.remove_circle,
+                                color: Colors.red,
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                    itemCount: valuelist?.length ?? 0,
+                    separatorBuilder: (BuildContext context, int index) {
+                      return Divider(
+                        indent: 15,
+                        endIndent: 15,
+                      );
+                    },
+                  ),
                 ),
                 ClipRRect(
                   borderRadius: BorderRadius.only(
@@ -333,7 +345,7 @@ class _CartscreenState extends State<Cartscreen> {
                     bottomRight: Radius.circular(10),
                   ),
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                     color: Color(0xFF292526),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -364,7 +376,11 @@ class _CartscreenState extends State<Cartscreen> {
                         GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onTap: () {
-                            print(valuelist![0].user?.mobileNumber ?? '');
+                            final Uri launchUri = Uri(
+                              scheme: 'tel',
+                              path: valuelist![0].user?.mobileNumber ?? '',
+                            );
+                            UrlLauncher.launchUrl(launchUri);
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(

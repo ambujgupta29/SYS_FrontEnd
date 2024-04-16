@@ -37,6 +37,9 @@ class ProductsBloc extends BaseBloc<ProductEvent, ProductState> {
     if (event is PostProductEvent) {
       yield* _handlePostProductEvent(event);
     }
+    if (event is GetMaxPriceEvent) {
+      yield* _handleGetMaxPriceEvent(event);
+    }
   }
 
   Stream<ProductState> _handleFetchAllProductEvent(
@@ -45,6 +48,9 @@ class ProductsBloc extends BaseBloc<ProductEvent, ProductState> {
     try {
       Map<String, dynamic> body = {
         "productName": event.productName,
+        "productCategory": event.productCategory,
+        "minValue": event.minValue,
+        "maxValue": event.maxValue,
       };
       final Response response =
           await ProductRepository().fetchAllProducts(body);
@@ -157,6 +163,19 @@ class ProductsBloc extends BaseBloc<ProductEvent, ProductState> {
       }
     } on Exception catch (ex) {
       yield FetchProductByIDFailedState(ex.toString());
+    }
+  }
+
+  Stream<ProductState> _handleGetMaxPriceEvent(GetMaxPriceEvent event) async* {
+    yield GetMaxPriceProgressState();
+    try {
+      final Response response = await ProductRepository().getMaxprice();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final maxPrice = (response.data['maxPrice']);
+        yield GetMaxPriceSuccessState(maxPrice);
+      }
+    } on Exception catch (ex) {
+      yield GetMaxPriceFailedState(ex.toString());
     }
   }
 }

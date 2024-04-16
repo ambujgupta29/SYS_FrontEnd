@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:focus_detector_v2/focus_detector_v2.dart';
@@ -18,6 +20,13 @@ import 'package:sys_mobile/ui/utils/app_images.dart';
 import 'package:sys_mobile/ui/utils/store/app_storage.dart';
 import 'package:sys_mobile/ui/utils/store/storage_constants.dart';
 
+class HorizontalItem {
+  IconData? icon;
+  String? title;
+
+  HorizontalItem(this.icon, this.title) {}
+}
+
 class HomeScreen extends StatefulWidget {
   final dynamic arguments;
   const HomeScreen({super.key, this.arguments});
@@ -27,21 +36,42 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<HorizontalItem> hItem = [
+    HorizontalItem(Icons.grid_view_outlined, "All"),
+    HorizontalItem(Icons.phone_android_outlined, "Electronics"),
+    HorizontalItem(Icons.directions_car_outlined, "Vehicles"),
+    HorizontalItem(Icons.bed_outlined, "Furniture"),
+    HorizontalItem(Icons.local_mall_outlined, "Beauty"),
+    HorizontalItem(Icons.auto_stories_outlined, "Books"),
+    HorizontalItem(Icons.draw_outlined, "Stationery"),
+    HorizontalItem(Icons.sports_volleyball_outlined, "Sports"),
+    HorizontalItem(Icons.miscellaneous_services_outlined, "Misc"),
+  ];
   ProductsBloc? _productsBloc;
   ProfileBloc? _profileBloc;
   Map<String, dynamic>? decodedToken;
   String? imageurl;
   Timer? _debounceTimer;
-  StreamSubscription<ProfileState>? _subscription;
+  StreamSubscription<ProfileState>? _subscriptionProfile;
+  StreamSubscription<ProductState>? _subscriptionProduct;
   List<String>? favlist;
+  String textValue = '';
+  double maxPrice = 0.0;
+  double maxSliderprice = 0.0;
+  double minPrice = 0.0;
+  String selectedTitle = "All";
+
   @override
   void initState() {
     _productsBloc = BlocProvider.of(context);
     _profileBloc = BlocProvider.of(context);
-    _subscription = _profileBloc?.stream.listen(favListener);
-    _productsBloc?.add(FetchAllProductsEvent(productName: ''));
+    _subscriptionProfile = _profileBloc?.stream.listen(favListener);
+    _productsBloc?.add(GetMaxPriceEvent());
+    _subscriptionProduct = _productsBloc?.stream.listen(maxPriceListener);
+
     _profileBloc?.add(GetProfilePictureEvent());
     _profileBloc?.add(GetFavListEvent());
+
     decodedToken = JwtDecoder.decode(AppStorage().getString(USER_TOKEN));
     print(decodedToken);
     super.initState();
@@ -81,10 +111,29 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> maxPriceListener(state) async {
+    if (state is GetMaxPriceSuccessState) {
+      stopLoader(context);
+      maxPrice = double.parse(state.maxPrice);
+      maxSliderprice = double.parse(state.maxPrice);
+      _productsBloc?.add(FetchAllProductsEvent(
+          productName: '',
+          productCategory: '',
+          minValue: minPrice,
+          maxValue: maxPrice));
+    } else if (state is GetMaxPriceFailedState) {
+      stopLoader(context);
+      print(state.message);
+    } else if (state is GetMaxPriceProgressState) {
+      startLoader(context);
+    }
+  }
+
   @override
   void dispose() {
     _debounceTimer?.cancel();
-    _subscription?.cancel();
+    _subscriptionProfile?.cancel();
+    _subscriptionProduct?.cancel();
     super.dispose();
   }
 
@@ -220,8 +269,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               _debounceTimer?.cancel();
                               _debounceTimer = Timer(
                                   const Duration(milliseconds: 1500), () async {
-                                _productsBloc?.add(
-                                    FetchAllProductsEvent(productName: value));
+                                textValue = value;
+                                _productsBloc?.add(FetchAllProductsEvent(
+                                    minValue: minPrice,
+                                    maxValue: maxPrice,
+                                    productName: value,
+                                    productCategory: (selectedTitle == 'All')
+                                        ? ''
+                                        : selectedTitle));
                               });
                             },
                             decoration: InputDecoration(
@@ -242,15 +297,204 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(
                         width: 20,
                       ),
-                      Container(
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                            color: Color(0XFF292526),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 12),
-                          child: AppImages.filter(context, height: 25)),
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                RangeValues _currentRangeValues =
+                                    RangeValues(minPrice, maxPrice);
+                                return StatefulBuilder(
+                                  builder: (BuildContext myContext,
+                                      void Function(void Function())
+                                          mySetState) {
+                                    return Container(
+                                      width: double.infinity,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              "Price range filter",
+                                              style: GoogleFonts.encodeSans(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ).copyWith(
+                                                  color: Color(0xff1B2028)),
+                                            ),
+                                            SliderTheme(
+                                              data: SliderTheme.of(myContext)
+                                                  .copyWith(
+                                                activeTrackColor:
+                                                    Colors.black87,
+                                                inactiveTrackColor:
+                                                    Colors.black26,
+                                                trackShape:
+                                                    RoundedRectSliderTrackShape(),
+                                                trackHeight: 4.0,
+                                                thumbColor: Colors.black,
+                                                thumbShape:
+                                                    RoundSliderThumbShape(
+                                                        enabledThumbRadius:
+                                                            12.0),
+                                                overlayColor:
+                                                    Colors.black.withAlpha(32),
+                                                overlayShape:
+                                                    RoundSliderOverlayShape(
+                                                        overlayRadius: 28.0),
+                                              ),
+                                              child: RangeSlider(
+                                                values: _currentRangeValues,
+                                                max: maxSliderprice,
+                                                divisions: null,
+                                                // (double.parse(state.maxPrice) * 100).toInt(),
+
+                                                // labels: RangeLabels(
+                                                //   _currentRangeValues.start
+                                                //       .round()
+                                                //       .toString(),
+                                                //   _currentRangeValues.end
+                                                //       .round()
+                                                //       .toString(),
+                                                // ),
+                                                onChanged:
+                                                    (RangeValues values) {
+                                                  mySetState(() {
+                                                    _currentRangeValues =
+                                                        values;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    _currentRangeValues.start
+                                                        .toStringAsFixed(2),
+                                                    style:
+                                                        GoogleFonts.encodeSans(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ).copyWith(
+                                                            color: Color(
+                                                                0xff1B2028)),
+                                                  ),
+                                                  Text(
+                                                    _currentRangeValues.end
+                                                        .toStringAsFixed(2),
+                                                    style:
+                                                        GoogleFonts.encodeSans(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ).copyWith(
+                                                            color: Color(
+                                                                0xff1B2028)),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            Center(
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  if (mounted) {
+                                                    Navigator.pop(context);
+                                                    setState(() {
+                                                      minPrice =
+                                                          _currentRangeValues
+                                                              .start;
+                                                      maxPrice =
+                                                          _currentRangeValues
+                                                              .end;
+                                                    });
+                                                    _productsBloc?.add(
+                                                        FetchAllProductsEvent(
+                                                            productName:
+                                                                textValue,
+                                                            productCategory:
+                                                                (selectedTitle ==
+                                                                        'All')
+                                                                    ? ''
+                                                                    : selectedTitle,
+                                                            minValue: minPrice,
+                                                            maxValue:
+                                                                maxPrice));
+                                                  }
+                                                },
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      color: Color(0xff1B2028),
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  10))),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 8.0,
+                                                        horizontal: 15.0),
+                                                    child: Text(
+                                                      "Set",
+                                                      style: GoogleFonts
+                                                          .encodeSans(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ).copyWith(
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              });
+                        },
+                        child: Container(
+                            decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                              color: Color(0XFF292526),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 12),
+                            child: AppImages.filter(context, height: 25)),
+                      ),
                     ],
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Container(
+                    height: 36,
+                    child: ListView.builder(
+                      itemCount: hItem.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          height: 10,
+                          child: horizontalListCard(
+                              icon: hItem[index].icon!,
+                              title: hItem[index].title!),
+                        );
+                      },
+                      scrollDirection: Axis.horizontal,
+                    ),
                   ),
                   const SizedBox(
                     height: 30,
@@ -517,6 +761,55 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           )),
+    );
+  }
+
+  Widget horizontalListCard({required IconData icon, required String title}) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedTitle = title;
+        });
+
+        _productsBloc?.add(FetchAllProductsEvent(
+            minValue: minPrice,
+            maxValue: maxPrice,
+            productName: textValue,
+            productCategory: (title == 'All') ? '' : title));
+      },
+      child: Container(
+        padding: EdgeInsets.all(8),
+        margin: EdgeInsets.symmetric(horizontal: 5),
+        decoration: BoxDecoration(
+            color: (selectedTitle == title) ? Color(0xff1B2028) : Colors.white,
+            borderRadius: BorderRadius.all(
+              Radius.circular(8),
+            ),
+            border: Border.all(color: Color(0xffEDEDED))),
+        child: Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(right: 8.0),
+              child: Icon(
+                icon,
+                color:
+                    (selectedTitle == title) ? Colors.white : Color(0xff1B2028),
+                size: 16,
+              ),
+            ),
+            Text(
+              title,
+              style: GoogleFonts.encodeSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ).copyWith(
+                color:
+                    (selectedTitle == title) ? Colors.white : Color(0xff1B2028),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

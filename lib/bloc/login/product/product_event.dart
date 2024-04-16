@@ -4,7 +4,14 @@ abstract class ProductEvent {}
 
 class FetchAllProductsEvent extends ProductEvent {
   final String productName;
-  FetchAllProductsEvent({required this.productName});
+  final String productCategory;
+  final double minValue;
+  final double maxValue;
+  FetchAllProductsEvent(
+      {required this.productName,
+      required this.productCategory,
+      required this.minValue,
+      required this.maxValue});
 }
 
 class FetchUserProductsEvent extends ProductEvent {
@@ -35,12 +42,14 @@ class PostProductEvent extends ProductEvent {
       this.images});
 }
 
-
 class FetchProductByIDEvent extends ProductEvent {
   final List<String> productIdList;
   FetchProductByIDEvent({required this.productIdList});
 }
 
+class GetMaxPriceEvent extends ProductEvent {
+  GetMaxPriceEvent();
+}
 // User Product Event
 
 

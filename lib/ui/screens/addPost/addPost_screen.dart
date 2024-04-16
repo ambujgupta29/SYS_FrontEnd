@@ -27,7 +27,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
   TextEditingController productName = TextEditingController();
   TextEditingController productDesc = TextEditingController();
   TextEditingController productPrice = TextEditingController();
-  String selectedValue = 'Option 1';
+  String selectedValue = 'Electronics';
   List<String> images = [
     'lib/assets/images/add.svg',
   ];
@@ -239,6 +239,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10)),
                         child: DropdownButtonFormField(
+                          isExpanded: true,
+                          isDense: true,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(15),
                             border: OutlineInputBorder(
@@ -252,9 +254,14 @@ class _AddPostScreenState extends State<AddPostScreen> {
                             });
                           },
                           items: <String>[
-                            'Option 1',
-                            'Option 2',
-                            'Option 3',
+                            'Electronics',
+                            'Vehicles',
+                            'Furniture',
+                            'Beauty',
+                            'Books',
+                            'Stationery',
+                            'Sports',
+                            'Misc',
                           ].map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
@@ -346,5 +353,4 @@ class _AddPostScreenState extends State<AddPostScreen> {
   //     },
   //   );
   // }
-
 }

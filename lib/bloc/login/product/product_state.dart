@@ -88,3 +88,17 @@ class FetchProductByIDSuccessState extends ProductState {
   FetchProductByIdModel fetchProductModel;
   FetchProductByIDSuccessState(this.fetchProductModel);
 }
+
+
+
+class GetMaxPriceProgressState extends ProductState {}
+
+class GetMaxPriceFailedState extends ProductState {
+  String message;
+  GetMaxPriceFailedState(this.message);
+}
+
+class GetMaxPriceSuccessState extends ProductState {
+  String maxPrice;
+  GetMaxPriceSuccessState(this.maxPrice);
+}

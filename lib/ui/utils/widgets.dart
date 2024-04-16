@@ -154,9 +154,10 @@ Widget Button({
               if (text != null)
                 Text(
                   text,
-                  style: SysAppTheme().textStyle(
-                    color: SysAppTheme().buttonTextColor,
-                  ),
+                  style: GoogleFonts.encodeSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ).copyWith(color: Colors.white),
                 ),
             ],
           ),
@@ -165,58 +166,58 @@ Widget Button({
 }
 
 void showPostStatusCard(
-      {required BuildContext context,
-      required IconData icon,
-      required String body,
-      required Color iconColor,
-      required String title}) {
-    // Show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: Text(
-            title,
-            style: GoogleFonts.encodeSans(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ).copyWith(color: Color(0xff1B2028)),
+    {required BuildContext context,
+    required IconData icon,
+    required String body,
+    required Color iconColor,
+    required String title}) {
+  // Show the dialog
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.white,
+        title: Text(
+          title,
+          style: GoogleFonts.encodeSans(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ).copyWith(color: Color(0xff1B2028)),
+        ),
+        content: Text(
+          textAlign: TextAlign.center,
+          body,
+          style: GoogleFonts.encodeSans(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ).copyWith(color: Color(0xff1B2028)),
+        ),
+        icon: CircleAvatar(
+          backgroundColor: iconColor.withOpacity(0.3),
+          child: Icon(
+            icon,
+            color: iconColor,
           ),
-          content: Text(
-            textAlign: TextAlign.center,
-            body,
-            style: GoogleFonts.encodeSans(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ).copyWith(color: Color(0xff1B2028)),
-          ),
-          icon: CircleAvatar(
-            backgroundColor: iconColor.withOpacity(0.3),
-            child: Icon(
-              icon,
-              color: iconColor,
-            ),
-          ),
-          // actions: <Widget>[
-          //   Center(
-          //     child: TextButton(
-          //       onPressed: () {
-          //         Navigator.of(context).pop();
-          //       },
-          //       child: Text('Ok',
-          //           style: GoogleFonts.encodeSans(
-          //             fontSize: 14,
-          //             fontWeight: FontWeight.w500,
-          //           )
-          //           // .copyWith(
-          //           //   color: Color(0xff1B2028),
-          //           // ),
-          //           ),
-          //     ),
-          //   ),
-          // ],
-        );
-      },
-    );
-  }
+        ),
+        // actions: <Widget>[
+        //   Center(
+        //     child: TextButton(
+        //       onPressed: () {
+        //         Navigator.of(context).pop();
+        //       },
+        //       child: Text('Ok',
+        //           style: GoogleFonts.encodeSans(
+        //             fontSize: 14,
+        //             fontWeight: FontWeight.w500,
+        //           )
+        //           // .copyWith(
+        //           //   color: Color(0xff1B2028),
+        //           // ),
+        //           ),
+        //     ),
+        //   ),
+        // ],
+      );
+    },
+  );
+}
